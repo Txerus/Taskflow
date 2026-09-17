@@ -14,9 +14,9 @@ Les cases de réalisation indiquent le code présent ; les validations natives e
 - [x] Shell Electron sécurisé, tray, rappels, capture, démarrage Windows
 - [x] NSIS et configuration de mise à jour
 - [x] Vitest et TypeScript réussis sur les sources finales
-- [ ] Playwright Electron réussi, captures clair/sombre 1280×800 et 1920×1080
+- [x] Playwright Electron réussi, captures clair/sombre 1280×800 et 1920×1080
 - [ ] Revue visuelle et corrections
-- [ ] pnpm build produit un .exe ; installation et lancement Windows vérifiés
+- [x] pnpm build produit un .exe ; installation et lancement Windows vérifiés
 - [ ] Validation utilisateur de Phase 1
 ## Phase 2 — pages (après validation)
 - [ ] Migrations carnets > sections > pages

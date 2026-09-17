@@ -1,36 +1,29 @@
 # Validation Phase 1
 
-Ce rapport distingue le code présent, les tests exécutés et les jalons bloqués. Il ne remplace pas le RAPPORT_FINAL attendu après les quatre phases.
+Preuve : [workflow Windows du 17 septembre 2026](https://github.com/Txerus/Taskflow/actions/runs/35264673781), commit `f7b27276cab7ed8dfa78f8b066d9beba52121b39`.
 
 | Vérification | État |
 |---|---|
-| Modèles, parsing et dates | 17 tests Vitest réussis après reconstruction |
-| SQLite, migrations, intégrité, récurrence, rappels | 10 tests Vitest réussis après reconstruction |
-| Composants Vue, sept vues, brouillons, calendrier, minuit | 14 tests Vitest réussis après reconstruction |
-| TypeScript strict | Réussi après reconstruction |
-| Compilation Vite/esbuild | Réussie après reconstruction |
-| Playwright Electron | Échec avant ouverture : serveur X / DISPLAY absent ; 1 échec, 5 non exécutés. Voir evidence/electron-e2e.log |
-| Captures visuelles réelles | Non réalisées ; test automatisé fourni |
-| Build installeur Windows | Échec : prébuild SQLite Windows absent pour Electron 44.4.1 ; voir evidence/windows-build.log |
-| Installation et lancement Windows | Non exécutés dans ce runtime Linux |
-| Rappels, tray, raccourci, auto-démarrage Windows | Code présent, validation native ouverte |
-| Auto-update de version à version | Code présent, serveur/certificat non configurés, test ouvert |
+| Métier, parsing et dates | 17 tests Vitest réussis sous Windows |
+| SQLite et migrations | 10 tests Vitest réussis sous Windows |
+| Vue et régression IPC | 15 tests Vitest réussis sous Windows |
+| TypeScript et compilation | Réussis |
+| Playwright Electron | 6 parcours réussis |
+| Captures clair/sombre 1280×800 et 1920×1080 | Générées par le parcours automatisé ; revue visuelle encore ouverte |
+| Installeur NSIS | pnpm build réussi |
+| Installation et lancement | Installation silencieuse, présence du binaire, fenêtre et création SQLite vérifiées sur runner Windows |
+| Rappels, tray, raccourci, démarrage automatique | Validation manuelle native encore ouverte |
+| Mise à jour entre versions | Serveur et certificat non configurés ; test ouvert |
 
-## Limites et décisions
+## Corrections issues de la CI
 
-- Phase 2 Tiptap/pages, Phase 3 OAuth/mails et Phase 4 bonus ne sont pas implémentées. Elles ne doivent pas être cochées avant leur réalisation.
-- Aucune fausse capture ni fichier .exe renommé : seuls les résultats réels sont annoncés.
-- Tests Vue sous happy-dom : vérifient comportements et DOM, pas le rendu de Chromium. Ils ne remplacent pas Playwright Electron ou l’installation Windows.
-- Six parcours Electron sont écrits. Un profil temporaire isole les données ; `--no-sandbox` est réservé au lanceur des tests Linux root. Le code de production conserve sandbox et contextIsolation.
-- Le visualiseur interne Design System utilise les vrais composants et tokens. Le polish visuel final reste ouvert.
-- La revue source séparée a identifié cinq points matériels : brouillons, déplacement calendrier, changement de jour, commentaires non envoyés, récurrence en majuscules. Les corrections sont couvertes par les tests, dont deux tests d’abandon confirmé ajoutés à la reprise.
-- Le workflow Windows est un fichier local, pas une exécution de CI déjà obtenue.
+- Nom accessible explicite du champ Priorité.
+- Normalisation des données réactives Vue avant le passage IPC : évite « An object could not be cloned » lors des déplacements et changements de statut. Régression sur tâche récurrente avec étiquettes ; le mock exige un objet clonable.
+- Déplacement par souris depuis la marge des cartes et attente de persistance de la prochaine occurrence.
+- Cible calendrier identifiée par sa date après dépôt, plutôt que par une sélection dynamique des cases vides.
 
-## Suite nécessaire pour fermer le jalon
+## Limites
 
-1. Exécuter le workflow ou les commandes du README sur Windows.
-2. Corriger tout échec Electron, observer les captures et le parcours complet.
-3. Vérifier l’installation NSIS et le lancement ; tester rappels et tray.
-4. Mettre à jour PLAN/PROGRESS avec les preuves puis obtenir la validation de Phase 1.
+Le test d’installation valide le runner Windows, pas encore le poste personnel de l’utilisateur. L’installeur n’est pas signé avec un certificat de production. Les captures n’ont pas été inspectées visuellement pendant cette session (environnement local indisponible). La Phase 1 attend sa revue visuelle et la validation utilisateur. Les phases 2 à 4 restent non implémentées ; aucun RAPPORT_FINAL n’est créé.
 
-Le gestionnaire système ne permet pas d’ajouter Xvfb : paquet absent du catalogue et actualisation refusée par les permissions du runtime. Aucun dépôt TaskFlow connecté n’a été trouvé pour exécuter la CI Windows.
+Les anciens journaux Linux dans docs/evidence conservent les blocages historiques, désormais dépassés par la validation Windows ci-dessus.
