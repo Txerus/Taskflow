@@ -15,3 +15,7 @@ Essais réels : Playwright Electron échoue avant ouverture, faute de serveur X 
 En cours / bloquant : exécuter la CI fournie sur un hôte Windows, corriger les éventuels échecs E2E, contrôler visuellement et vérifier installation, tray, notifications et mises à jour. Aucun dépôt TaskFlow connecté trouvé à la recherche ; aucune publication distante effectuée. Décision nécessaire pour continuer les validations natives : fournir un dépôt cible ou un environnement Windows.
 
 Décisions : rester en Phase 1 ; ne pas déclarer la phase terminée ni démarrer Tiptap/OAuth avant les jalons et la validation utilisateur. Les commits intermédiaires préservent le code mais ne représentent pas un jalon E2E réussi. Archive contenant sources, lockfile, documentation, preuves et bundle Git pour reprise.
+
+## Publication GitHub — 17 septembre 2026
+Dépôt créé par l’utilisateur : https://github.com/Txerus/Taskflow. Les 58 fichiers du projet ont été transférés et leur présence vérifiée sur main (commit e0797e264d3e12546335f6f3163bef00fe15367f). REQUIREMENTS.md ajouté. Publication par API : les anciens commits locaux restent dans l’archive de reprise, l’historique distant commence par l’import.
+Le workflow Windows a démarré : https://github.com/Txerus/Taskflow/actions/runs/35253993511. Au dernier contrôle, le job est en cours ; tests et installeur non encore validés. Reprendre par la lecture du résultat et des journaux de ce workflow.

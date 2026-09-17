@@ -27,7 +27,7 @@ pnpm build
 Sortie attendue lorsque le build réussit : `release/TaskFlow-Setup-0.1.0.exe`.
 `pnpm compile` produit les bundles, **pas** un installeur. Le build croisé Linux nécessite Wine et un prébuild SQLite Windows pour la version exacte d’Electron ; à défaut il s’arrête explicitement. Un contrôle de format empêche d’embarquer un binaire Linux à sa place.
 
-Le workflow `.github/workflows/windows.yml` exécute typecheck, Vitest, Playwright Electron, build NSIS et un test installation/lancement/SQLite. Il est fourni **sans exécution distante ni publication**. Pour l’utiliser, placer ce projet dans votre dépôt GitHub puis lancer le workflow. Les captures et rapports de tests deviennent alors ses artefacts.
+Le workflow `.github/workflows/windows.yml` exécute typecheck, Vitest, Playwright Electron, build NSIS et un test installation/lancement/SQLite. Le projet est publié sur https://github.com/Txerus/Taskflow. Le premier workflow Windows a été déclenché ; son résultat reste à vérifier dans l’onglet Actions. Les prérequis détaillés sont dans `REQUIREMENTS.md`. Les captures et rapports de tests deviennent alors ses artefacts.
 
 ## Fonctions Phase 1
 
