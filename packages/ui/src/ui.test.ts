@@ -28,6 +28,8 @@ function data(): DataStore {
       return t;
     },
     updateTask: async (id, revision, input) => {
+      // Electron IPC rejects Vue proxies, including nested tags/recurrence.
+      structuredClone(input);
       const index = state.tasks.findIndex((t) => t.id === id);
       if (state.tasks[index].revision !== revision) throw new Error("Conflit");
       const t = { ...state.tasks[index], ...input, revision: revision + 1 };
@@ -137,6 +139,18 @@ describe("interface Vue portable", () => {
     await flushPromises();
     expect(state.tasks[0].description).toBe("Offre machine");
     expect(store.editorDirty).toBe(false);
+  });
+  it("envoie un objet clonable lors du déplacement d’une tâche récurrente", async () => {
+    const { store } = await boot("/kanban");
+    await store.create("Contrôle chaque mois #client !1");
+    await flushPromises();
+    store.select(null);
+    await store.change(store.snapshot.tasks[0], { status: "doing" });
+    await flushPromises();
+    expect(store.error).toBe("");
+    expect(state.tasks[0].status).toBe("doing");
+    expect(state.tasks[0].recurrence?.unit).toBe("month");
+    expect(state.tasks[0].tagIds).toHaveLength(1);
   });
   it("rend les sept vues", async () => {
     const { store, router } = await boot();

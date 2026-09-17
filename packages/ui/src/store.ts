@@ -147,7 +147,7 @@ export const useTasks = defineStore("tasks", () => {
     if (selectedId.value === task.id && !discardDraft()) return;
     return run(async () => {
       const before = snapshot.value.tasks;
-      const input = { ...taskDto(task), ...patch };
+      const input = taskInputSchema.parse({ ...taskDto(task), ...patch });
       snapshot.value.tasks = before.map((t) =>
         t.id === task.id ? { ...t, ...patch } : t,
       );
