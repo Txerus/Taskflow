@@ -1,0 +1,17 @@
+# PROGRESS — TaskFlow
+## 2026-09-17 : session initiale
+Architecture et sources Phase 1 écrites. Avant la réinitialisation : 39 tests Vitest réussis, typecheck et compilation réussis. Ce résultat concerne les anciens fichiers ; il ne valide pas automatiquement la reconstruction.
+Revue source : correction des brouillons, récurrence majuscule, calendrier draggable, journée réactive ; deux cas résiduels d’abandon doivent être corrigés par un signal explicite de reset.
+Bloquants observés : Electron ne démarre pas dans le runtime Linux (sockets locaux / rendu refusés). Build Windows incomplet : absence Wine initialement, puis prébuild better-sqlite3 Windows indisponible pour Electron 44.4.1. Un ancien essai embarquait un module ELF Linux : ne jamais livrer ce paquet. Garde PE et compilation Windows native à conserver.
+## Reprise / récupération
+Le dossier local a été effacé avant sauvegarde durable. Reconstruction depuis le code de la conversation ; aucun fichier utilisateur supprimé volontairement. Les tests sont à relancer et une archive durable est prioritaire.
+Phases 2–4 non commencées : validation utilisateur et jalon Windows obligatoires. Aucun OAuth requis pour Phase 1. Pas de rapport final prématuré.
+
+## Reprise — sources restaurées et contrôles réexécutés
+Fait : reconstruction du monorepo complet de Phase 1, sauvegarde durable de l’archive, 41 tests Vitest réussis (17 métier, 10 SQLite, 14 UI), TypeScript et compilation réussis. Corrections finales de l’abandon de brouillon couvertes par tests et revue source indépendante. Six parcours Electron et un workflow Windows avec installation NSIS sont présents. README, contrat DataStore, SQL, canaux IPC et guide de validation sont inclus.
+
+Essais réels : Playwright Electron échoue avant ouverture, faute de serveur X / DISPLAY (1 échec, 5 non exécutés). Installation Xvfb impossible dans ce runtime : catalogue incomplet et permissions système refusées. `pnpm build` réussit typecheck et bundling, puis échoue faute de prébuild better-sqlite3 Windows pour Electron 44.4.1. La garde empêche d’embarquer le module Linux dans un faux installeur Windows. Journaux dans docs/evidence. Aucun .exe validé, aucune capture visuelle réelle.
+
+En cours / bloquant : exécuter la CI fournie sur un hôte Windows, corriger les éventuels échecs E2E, contrôler visuellement et vérifier installation, tray, notifications et mises à jour. Aucun dépôt TaskFlow connecté trouvé à la recherche ; aucune publication distante effectuée. Décision nécessaire pour continuer les validations natives : fournir un dépôt cible ou un environnement Windows.
+
+Décisions : rester en Phase 1 ; ne pas déclarer la phase terminée ni démarrer Tiptap/OAuth avant les jalons et la validation utilisateur. Les commits intermédiaires préservent le code mais ne représentent pas un jalon E2E réussi. Archive contenant sources, lockfile, documentation, preuves et bundle Git pour reprise.

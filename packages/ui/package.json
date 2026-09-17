@@ -1,0 +1,24 @@
+{
+  "name": "@taskflow/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@taskflow/core": "workspace:*",
+    "@taskflow/data": "workspace:*",
+    "vue": "3.5.42",
+    "vue-router": "4.6.4",
+    "pinia": "3.0.4",
+    "tailwindcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.3",
+    "reka-ui": "^2.8.0",
+    "lucide-vue-next": "0.577.0",
+    "date-fns": "4.1.0",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
+    "@fontsource/ibm-plex-mono": "^5.2.7"
+  }
+}

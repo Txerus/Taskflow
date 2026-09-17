@@ -1,0 +1,102 @@
+$ pnpm compile && electron-builder install-app-deps && playwright test --max-failures=1
+$ node scripts/build.mjs
+vite v7.3.6 building client environment for production...
+transforming...
+node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 2464 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/renderer/index.html                                              0.70 kB │ gzip:  0.40 kB
+../dist/renderer/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff    13.14 kB
+../dist/renderer/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2   14.71 kB
+../dist/renderer/assets/ibm-plex-sans-latin-400-normal-CYLoc0-x.woff    22.10 kB
+../dist/renderer/assets/ibm-plex-sans-latin-400-normal-CDDApCn2.woff2   22.59 kB
+../dist/renderer/assets/ibm-plex-sans-latin-600-normal-Cu4Hd6ag.woff    23.88 kB
+../dist/renderer/assets/ibm-plex-sans-latin-500-normal-BgVn5rGT.woff    23.92 kB
+../dist/renderer/assets/ibm-plex-sans-latin-500-normal-6ng42L7E.woff2   24.18 kB
+../dist/renderer/assets/ibm-plex-sans-latin-600-normal-CuJfVYMP.woff2   24.25 kB
+../dist/renderer/assets/index-DZ_RLj02.css                              20.12 kB │ gzip:  5.05 kB
+../dist/renderer/assets/index-D7-NbYAM.js                              261.77 kB │ gzip: 88.00 kB
+✓ built in 3.26s
+  • electron-builder  version=26.15.3
+  • loaded configuration  file=package.json ("build" field)
+  • detected workspace root for project using packageManager field  pm=pnpm config=pnpm@11.19.0 resolved=/workspace/scratch/071991141ae6/taskflow projectDir=/workspace/scratch/071991141ae6/taskflow
+  • installing dependencies  pm=pnpm platform=linux arch=x64 projectDir=/workspace/scratch/071991141ae6/taskflow appDir=/workspace/scratch/071991141ae6/taskflow/apps/desktop workspaceRoot=/workspace/scratch/071991141ae6/taskflow
+  • executing @electron/rebuild  electronVersion=44.4.1 arch=x64 buildFromSource=false workspaceRoot=/workspace/scratch/071991141ae6/taskflow projectDir=./ appDir=apps/desktop
+  • installing native dependencies  arch=x64
+  • preparing       moduleName=better-sqlite3 arch=x64
+  • finished        moduleName=better-sqlite3 arch=x64
+  • completed installing native dependencies
+
+Running 6 tests using 1 worker
+
+(node:311) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Downloading Electron binary...
+(node:323) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 tests/e2e/taskflow.spec.ts:47:1 › capture française, détail, sous-tâche, commentaire, suppression et annulation (20.6s)
+Testing stopped early after 1 maximum allowed failures.
+
+
+  1) tests/e2e/taskflow.spec.ts:47:1 › capture française, détail, sous-tâche, commentaire, suppression et annulation 
+
+    Error: electron.launch: Process failed to launch!
+    Call log:
+      - <launching> /workspace/scratch/071991141ae6/taskflow/node_modules/.pnpm/electron@44.4.1_supports-color@7.2.0/node_modules/electron/dist/electron -r /workspace/scratch/071991141ae6/taskflow/node_modules/.pnpm/playwright-core@1.63.0/node_modules/playwright-core/lib/server/electron/loader.js --inspect=0 --remote-debugging-port=0 --no-sandbox /workspace/scratch/071991141ae6/taskflow/apps/desktop
+      - <launched> pid=343
+      - [pid=343][err] [343:0917/163710.946562:ERROR:dbus/bus.cc:406] Failed to connect to the bus: Failed to open socket: Operation not permitted
+      - [pid=343][err] [343:0917/163710.946644:ERROR:dbus/bus.cc:406] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")
+      - [pid=343][err] Debugger listening on ws://127.0.0.1:36303/0c6d857a-d3ad-4ae4-9efb-89346a4a2835
+      - [pid=343][err] For help, see: https://nodejs.org/learn/getting-started/debugging
+      - <ws connecting> ws://127.0.0.1:36303/0c6d857a-d3ad-4ae4-9efb-89346a4a2835
+      - <ws connected> ws://127.0.0.1:36303/0c6d857a-d3ad-4ae4-9efb-89346a4a2835
+      - [pid=343][err] Debugger attached.
+      - [pid=343][err] (node:343) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+      - [pid=343][err] (Use `electron --trace-warnings ...` to show where the warning was created)
+      - [pid=343][err] [343:0917/163711.128151:ERROR:ui/ozone/platform/x11/ozone_platform_x11.cc:257] Missing X server or $DISPLAY
+      - [pid=343][err] [343:0917/163711.128177:ERROR:ui/aura/env.cc:246] The platform failed to initialize.  Exiting.
+      - <ws disconnected> ws://127.0.0.1:36303/0c6d857a-d3ad-4ae4-9efb-89346a4a2835 code=1005 reason=
+      - [pid=343] <kill>
+      - [pid=343] <will force kill>
+      - [pid=343] <process did exit: exitCode=null, signal=SIGTRAP>
+      - [pid=343] starting temporary directories cleanup
+      - [pid=343] finished temporary directories cleanup
+
+
+      11 | let app: ElectronApplication, page: Page, profile: string;
+      12 | async function launch() {
+    > 13 |   app = await electron.launch({
+         |         ^
+      14 |     args: [
+      15 |       ...(process.platform === "linux" ? ["--no-sandbox"] : []),
+      16 |       resolve("apps/desktop"),
+        at launch (/workspace/scratch/071991141ae6/taskflow/tests/e2e/taskflow.spec.ts:13:9)
+        at /workspace/scratch/071991141ae6/taskflow/tests/e2e/taskflow.spec.ts:30:3
+
+    Error Context: test-results/taskflow-capture-française-8da08-e-suppression-et-annulation/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/taskflow-capture-française-8da08-e-suppression-et-annulation/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/taskflow-capture-française-8da08-e-suppression-et-annulation/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    tests/e2e/taskflow.spec.ts:47:1 › capture française, détail, sous-tâche, commentaire, suppression et annulation 
+  5 did not run
+  1 error was not a part of any test, see above for details
+[ELIFECYCLE] Command failed with exit code 1.

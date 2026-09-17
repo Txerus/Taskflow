@@ -1,0 +1,38 @@
+$ pnpm typecheck && pnpm compile && node scripts/package.mjs
+$ vue-tsc --noEmit
+$ node scripts/build.mjs
+vite v7.3.6 building client environment for production...
+transforming...
+node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "node_modules/.pnpm/zod@4.6.5/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 2464 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/renderer/index.html                                              0.70 kB │ gzip:  0.40 kB
+../dist/renderer/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff    13.14 kB
+../dist/renderer/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2   14.71 kB
+../dist/renderer/assets/ibm-plex-sans-latin-400-normal-CYLoc0-x.woff    22.10 kB
+../dist/renderer/assets/ibm-plex-sans-latin-400-normal-CDDApCn2.woff2   22.59 kB
+../dist/renderer/assets/ibm-plex-sans-latin-600-normal-Cu4Hd6ag.woff    23.88 kB
+../dist/renderer/assets/ibm-plex-sans-latin-500-normal-BgVn5rGT.woff    23.92 kB
+../dist/renderer/assets/ibm-plex-sans-latin-500-normal-6ng42L7E.woff2   24.18 kB
+../dist/renderer/assets/ibm-plex-sans-latin-600-normal-CuJfVYMP.woff2   24.25 kB
+../dist/renderer/assets/index-DZ_RLj02.css                              20.12 kB │ gzip:  5.05 kB
+../dist/renderer/assets/index-D7-NbYAM.js                              261.77 kB │ gzip: 88.00 kB
+✓ built in 3.28s
+(node:119) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+prebuild-install warn install No prebuilt binaries found (target=44.4.1 runtime=electron arch=x64 libc= platform=win32)
+Error: Précompilation SQLite Windows indisponible. Compiler sur Windows avec les outils C++.
+    at file:///workspace/scratch/071991141ae6/taskflow/scripts/package.mjs:30:11
+[ELIFECYCLE] Command failed with exit code 1.

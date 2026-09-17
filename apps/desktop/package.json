@@ -1,0 +1,23 @@
+{
+  "name": "@taskflow/desktop",
+  "version": "0.1.0",
+  "productName": "TaskFlow",
+  "description": "Gestion de tâches personnelle en français",
+  "author": "TaskFlow",
+  "private": true,
+  "main": "dist/main.cjs",
+  "dependencies": {
+    "better-sqlite3": "12.11.1",
+    "electron-updater": "6.8.3"
+  },
+  "devDependencies": {
+    "@taskflow/core": "workspace:*",
+    "@taskflow/data": "workspace:*",
+    "@taskflow/ui": "workspace:*",
+    "vue": "3.5.42",
+    "pinia": "3.0.4",
+    "vue-router": "4.6.4",
+    "@tailwindcss/vite": "4.3.3",
+    "@vitejs/plugin-vue": "6.0.9"
+  }
+}

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+release/
+playwright-report/
+test-results/
+*.db*
+.env*
+!.env.example
+.agents/skills/
+
+taskflow-history.bundle

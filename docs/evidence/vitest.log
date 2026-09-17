@@ -1,0 +1,18 @@
+$ pnpm -r rebuild better-sqlite3 && vitest run
+Scope: all 5 workspace projects
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: (node:35) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead
+.../node_modules/better-sqlite3 install: (Use `node --trace-deprecation ...` to show where the warning was created)
+.../node_modules/better-sqlite3 install: Done
+
+ RUN  v3.2.7 /workspace/scratch/071991141ae6/taskflow
+
+ ✓ packages/core/src/core.test.ts (17 tests) 17ms
+ ✓ packages/data/src/sqlite.test.ts (10 tests) 40ms
+ ✓ packages/ui/src/ui.test.ts (14 tests) 642ms
+
+ Test Files  3 passed (3)
+      Tests  41 passed (41)
+   Start at  16:39:15
+   Duration  2.19s (transform 709ms, setup 0ms, collect 1.39s, tests 700ms, environment 247ms, prepare 178ms)
+

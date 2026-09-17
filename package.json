@@ -1,0 +1,62 @@
+{
+  "name": "taskflow-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "dev": "electron-builder install-app-deps && node scripts/dev.mjs",
+    "compile": "node scripts/build.mjs",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "pnpm -r rebuild better-sqlite3 && vitest run",
+    "test:e2e": "pnpm compile && electron-builder install-app-deps && playwright test",
+    "build": "pnpm typecheck && pnpm compile && node scripts/package.mjs",
+    "format": "prettier --write apps packages scripts tests *.ts *.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/better-sqlite3": "7.6.13",
+    "@types/node": "24.13.5",
+    "@vitejs/plugin-vue": "6.0.9",
+    "@vue/test-utils": "2.5.0",
+    "electron": "44.4.1",
+    "electron-builder": "26.15.3",
+    "esbuild": "0.25.12",
+    "happy-dom": "20.14.5",
+    "typescript": "5.9.3",
+    "vite": "7.3.6",
+    "vitest": "3.2.7",
+    "vue": "3.5.42",
+    "vue-tsc": "3.3.11",
+    "prettier": "3.9.7"
+  },
+  "build": {
+    "appId": "fr.taskflow.desktop",
+    "productName": "TaskFlow",
+    "directories": {
+      "app": "apps/desktop",
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "apps/desktop/assets/icon.ico",
+      "artifactName": "TaskFlow-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": null
+  }
+}
