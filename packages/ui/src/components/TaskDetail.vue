@@ -161,7 +161,10 @@ async function attach() {
             </option>
           </select></label
         ><label
-          >Priorité<select v-model.number="draft.priority">
+          ><span id="task-priority-label">Priorité</span><select
+            v-model.number="draft.priority"
+            aria-labelledby="task-priority-label"
+          >
             <option :value="1">P1 · Haute</option>
             <option :value="2">P2 · Moyenne</option>
             <option :value="3">P3 · Normale</option>

@@ -19,3 +19,6 @@ Décisions : rester en Phase 1 ; ne pas déclarer la phase terminée ni démarre
 ## Publication GitHub — 17 septembre 2026
 Dépôt créé par l’utilisateur : https://github.com/Txerus/Taskflow. Les 58 fichiers du projet ont été transférés et leur présence vérifiée sur main (commit e0797e264d3e12546335f6f3163bef00fe15367f). REQUIREMENTS.md ajouté. Publication par API : les anciens commits locaux restent dans l’archive de reprise, l’historique distant commence par l’import.
 Le workflow Windows a démarré : https://github.com/Txerus/Taskflow/actions/runs/35253993511. Au dernier contrôle, le job est en cours ; tests et installeur non encore validés. Reprendre par la lecture du résultat et des journaux de ce workflow.
+
+## Correction du premier workflow Windows
+Run 35253993511 : Electron et SQLite démarrent sous Windows ; 4 parcours E2E passent, 2 échouent (libellé exact Priorité, déplacement Kanban). Le build NSIS n’a pas été exécuté après cet échec. Ajout d’un nom accessible explicite à Priorité ; le test de déplacement démarre sur la marge de la carte hors boutons et effectue deux mouvements sur la cible avant de relâcher. Ajout d’une attente de persistance de la prochaine occurrence. Aucun test désactivé. Nouvelle validation complète demandée par le push. Environnement local indisponible : exécution déléguée au workflow Windows, résultat à contrôler.

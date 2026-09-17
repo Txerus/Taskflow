@@ -4,6 +4,7 @@ import {
   _electron as electron,
   type ElectronApplication,
   type Page,
+  type Locator,
 } from "@playwright/test";
 import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -40,6 +41,24 @@ async function create(text: string) {
     .getByRole("button", { name: "Créer la tâche", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
+}
+// Start on the card padding, away from its nested buttons and selectable text.
+// Two moves over the target ensure Chromium dispatches dragover before mouseup.
+async function dragTask(source: Locator, target: Locator) {
+  await source.scrollIntoViewIfNeeded();
+  await target.scrollIntoViewIfNeeded();
+  const from = await source.boundingBox();
+  const to = await target.boundingBox();
+  if (!from || !to) throw new Error("Zone de déplacement invisible");
+  await page.mouse.move(from.x + 4, from.y + 4);
+  await page.mouse.down();
+  try {
+    await page.mouse.move(from.x + 16, from.y + 8, { steps: 5 });
+    await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 10 });
+    await page.mouse.move(to.x + to.width / 2 + 1, to.y + to.height / 2 + 1);
+  } finally {
+    await page.mouse.up();
+  }
 }
 async function closeDetail() {
   await page.getByRole("button", { name: "Fermer les détails" }).click();
@@ -125,13 +144,13 @@ test("déplacement Kanban, Matrice et calendrier ; récurrence", async () => {
   const target = page
     .locator(".board-column")
     .filter({ has: page.getByRole("heading", { name: "En cours" }) });
-  await page.locator(".task-row").dragTo(target);
+  await dragTask(page.locator(".task-row"), target);
   await expect(target.getByText("Contrôle", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Matrice", exact: true }).click();
   const q = page
     .locator(".quadrant")
     .filter({ has: page.getByRole("heading", { name: "Faire maintenant" }) });
-  await page.locator(".task-row").dragTo(q);
+  await dragTask(page.locator(".task-row"), q);
   await expect(q.getByText("Contrôle", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Calendrier", exact: true }).click();
   await expect(page.locator(".calendar-task")).toHaveCount(1);
@@ -140,7 +159,7 @@ test("déplacement Kanban, Matrice et calendrier ; récurrence", async () => {
       .filter({ hasNot: page.locator(".calendar-task") })
       .nth(10),
     day = await cell.getAttribute("data-day");
-  await page.locator(".calendar-task").dragTo(cell);
+  await dragTask(page.locator(".calendar-task"), cell);
   await expect(cell.locator(".calendar-task")).toHaveCount(1);
   expect(
     (await page.evaluate(() => window.taskflow.data.snapshot())).tasks[0]
@@ -151,6 +170,9 @@ test("déplacement Kanban, Matrice et calendrier ; récurrence", async () => {
     .getByRole("button", { name: "Terminer Contrôle", exact: true })
     .click();
   await expect(page.locator(".task-row")).toHaveCount(1);
+  await expect.poll(async () =>
+    (await page.evaluate(() => window.taskflow.data.snapshot())).tasks.length,
+  ).toBe(2);
   const snapshot = await page.evaluate(() => window.taskflow.data.snapshot());
   expect(snapshot.tasks).toHaveLength(2);
   expect(snapshot.tasks.filter((t) => t.status === "done")).toHaveLength(1);
