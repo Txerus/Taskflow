@@ -17,12 +17,21 @@ Les cases de réalisation indiquent le code présent ; les validations natives e
 - [x] Playwright Electron réussi, captures clair/sombre 1280×800 et 1920×1080
 - [ ] Revue visuelle et corrections
 - [x] pnpm build produit un .exe ; installation et lancement Windows vérifiés
-- [ ] Validation utilisateur de Phase 1
-## Phase 2 — pages (après validation)
-- [ ] Migrations carnets > sections > pages
-- [ ] Tiptap : titres, tableaux, images, code et checklists
-- [ ] Checklist ↔ tâche, liens [[page]] et @tâche
-- [ ] Recherche globale, tests, audits, build et validation
+- [x] Validation utilisateur de Phase 1 — accord reçu le 17 septembre 2026
+## Phase 2 — pages (autorisée le 17 septembre 2026)
+- [ ] Migration additive carnets > sections > pages, sans perte des tâches existantes
+- [ ] Contrats DataStore asynchrones, validation métier et canaux IPC dédiés
+- [ ] Création, renommage, déplacement et suppression/restauration des carnets, sections et pages
+- [ ] Navigation Vue et éditeur Tiptap : titres, tableaux, images, code et checklists
+- [ ] Sauvegarde avec révision, détection de conflits et protection du contenu non enregistré
+- [ ] Checklist ↔ tâche : lien stable, synchronisation du statut sans doublons
+- [ ] Liens [[page]] et @tâche : sélection, navigation et gestion des éléments supprimés
+- [ ] Recherche globale pages/tâches avec extraits et navigation
+- [ ] Tests Vitest : migration depuis Phase 1, contenu, conflits et liens
+- [ ] Tests Electron : rédaction, redémarrage, recherche, checklist et navigation
+- [ ] Revue visuelle clair/sombre, clavier et captures
+- [ ] Build Windows, installation et conservation des données Phase 1
+- [ ] Validation utilisateur de Phase 2
 ## Phase 3 — mails
 - [ ] Identifiants Azure / Google fournis par l’utilisateur
 - [ ] OAuth PKCE loopback, tokens safeStorage

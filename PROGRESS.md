@@ -27,3 +27,8 @@ Diagnostic run 35264054389 : dragstart et drop reçus ; la bannière affiche « 
 
 ## Validation Windows réussie — 17 septembre 2026
 Run https://github.com/Txerus/Taskflow/actions/runs/35264673781 (commit f7b27276cab7ed8dfa78f8b066d9beba52121b39) : TypeScript, 42 tests Vitest, 6 parcours Electron, pnpm build et test NSIS installation/lancement/SQLite réussis. Dernière correction de test : cibler la date stable du calendrier, et non une liste de cases vides qui change après le dépôt. Captures clair/sombre produites automatiquement ; revue visuelle humaine et tests natifs tray/rappels/mise à jour restent ouverts. Phase 2 non commencée.
+
+## Phase 2 autorisée — 17 septembre 2026
+L’utilisateur confirme « parfait je valide continue ». Validation de Phase 1 enregistrée ; Phase 2 autorisée. La revue visuelle indépendante et les contrôles manuels natifs restent consignés comme non effectués, sans les confondre avec cet accord.
+Plan Phase 2 détaillé : migration additive, contrat DataStore/IPC, éditeur Tiptap, sauvegarde/révisions, checklist liée, références pages/tâches, recherche et parcours de non-régression.
+Blocage de cette reprise : l’environnement d’exécution est signalé unavailable et aucun outil terminal/filesystem n’est exposé. GitHub reste accessible ; le plan et ce journal sont enregistrés dans le dépôt. Aucun code Phase 2 n’est annoncé comme implémenté. Reprise nécessaire dans un environnement de développement actif pour installer/verrouiller Tiptap, exécuter les tests locaux et inspecter le rendu. Ne pas redemander la validation de Phase 1.
