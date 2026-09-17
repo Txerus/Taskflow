@@ -159,8 +159,10 @@ test("déplacement Kanban, Matrice et calendrier ; récurrence", async () => {
       .filter({ hasNot: page.locator(".calendar-task") })
       .nth(10),
     day = await cell.getAttribute("data-day");
-  await dragTask(page.locator(".calendar-task"), cell);
-  await expect(cell.locator(".calendar-task")).toHaveCount(1);
+  // Keep the destination identity after it stops being an empty day.
+  const destination = page.locator(`.calendar-day[data-day="${day}"]`);
+  await dragTask(page.locator(".calendar-task"), destination);
+  await expect(destination.locator(".calendar-task")).toHaveCount(1);
   expect(
     (await page.evaluate(() => window.taskflow.data.snapshot())).tasks[0]
       .dueDate,
