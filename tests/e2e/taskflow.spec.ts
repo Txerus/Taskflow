@@ -45,6 +45,20 @@ async function create(text: string) {
 // Start on the card padding, away from its nested buttons and selectable text.
 // Two moves over the target ensure Chromium dispatches dragover before mouseup.
 async function dragTask(source: Locator, target: Locator) {
+  await page.evaluate(() => {
+    (window as any).__dragEvents = [];
+    for (const name of ["dragstart", "dragenter", "dragover", "drop", "dragend"]) {
+      document.addEventListener(name, (event) => {
+        const e = event as DragEvent;
+        (window as any).__dragEvents.push({
+          name, target: (e.target as HTMLElement)?.className,
+          types: Array.from(e.dataTransfer?.types ?? []),
+          id: e.dataTransfer?.getData("text/taskflow-id"),
+          prevented: e.defaultPrevented,
+        });
+      });
+    }
+  });
   await source.scrollIntoViewIfNeeded();
   await target.scrollIntoViewIfNeeded();
   const from = await source.boundingBox();
@@ -58,6 +72,8 @@ async function dragTask(source: Locator, target: Locator) {
     await page.mouse.move(to.x + to.width / 2 + 1, to.y + to.height / 2 + 1);
   } finally {
     await page.mouse.up();
+    console.log("Drag diagnostic", await page.evaluate(() => ({ events: (window as any).__dragEvents, error: document.querySelector(".error-banner")?.textContent, cards: Array.from(document.querySelectorAll(".board-column")).map(e => e.textContent) })));
+    console.log("Task state", await page.evaluate(async () => (await window.taskflow.data.snapshot()).tasks.map(t => ({title:t.title,status:t.status}))));
   }
 }
 async function closeDetail() {
