@@ -12,6 +12,8 @@ export const channels = {
   createTaskFromMail: "mail:createTask",
   waitForMailReply: "mail:waitForReply",
   resolveMailWaiting: "mail:resolveWaiting",
+  saveMailRule: "mail:saveRule",
+  deleteMailRule: "mail:deleteRule",
 
   notesSnapshot: "notes:notesSnapshot",
   saveNotebook: "notes:saveNotebook",
