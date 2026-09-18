@@ -154,6 +154,18 @@ describe("SQLite", () => {
       },
     ]);
     expect(await store.mailAttachments(first.id)).toHaveLength(1);
+    const rule = await store.saveMailRule({
+      name: "Clients",
+      enabled: true,
+      senderContains: "client@",
+      subjectContains: "offre",
+      unreadOnly: false,
+      createTask: true,
+      priority: 2,
+    });
+    expect(store.mail.matchingRules(first).map((x) => x.id)).toContain(rule.id);
+    await store.deleteMailRule(rule.id);
+    expect((await store.mailSnapshot()).rules).toHaveLength(0);
     const task = await store.createTaskFromMail(
       first.id,
       input("Répondre à Offre à relancer"),
