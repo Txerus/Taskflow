@@ -237,6 +237,7 @@ export class MailService {
         folder: (m.labelIds ?? []).includes("SENT") ? "sent" : "inbox",
       });
       this.store.mail.replaceAttachments(saved.id, gmailAttachments(m.payload));
+      this.store.mail.resolveMatchingReplies(saved);
       await this.applyRules(saved);
       count++;
     }
@@ -327,6 +328,7 @@ export class MailService {
             })),
         );
       } else this.store.mail.replaceAttachments(saved.id, []);
+      this.store.mail.resolveMatchingReplies(saved);
       await this.applyRules(saved);
     }
     return result.value.length;
