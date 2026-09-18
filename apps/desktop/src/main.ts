@@ -97,6 +97,8 @@ function registerIpc() {
   );
   handle(c.waitForMailReply, (input) => store.waitForMailReply(input));
   handle(c.resolveMailWaiting, (id) => store.resolveMailWaiting(id));
+  handle(c.saveMailRule, (input) => store.saveMailRule(input));
+  handle(c.deleteMailRule, (id) => store.deleteMailRule(id));
 
   handle(c.notesSnapshot, () => store.notesSnapshot());
   handle(c.saveNotebook, (i) => store.saveNotebook(i));
