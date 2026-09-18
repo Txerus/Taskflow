@@ -34,6 +34,9 @@ const store = useTasks(),
   route = useRoute(),
   search = ref<HTMLInputElement | null>(null),
   commandQuery = ref("");
+const taskRoute = computed(
+  () => !route.path.startsWith("/notes") && route.path !== "/design",
+);
 const navigation = [
   { id: "today", label: "Aujourd’hui", icon: Sun },
   { id: "upcoming", label: "À venir", icon: CalendarRange },
@@ -140,8 +143,13 @@ function keyboard(event: KeyboardEvent) {
     store.captureOpen = true;
   } else if (event.key === "/") {
     event.preventDefault();
-    search.value?.focus();
-  } else if (event.key.toLowerCase() === "e" && store.selected) {
+    if (taskRoute.value) search.value?.focus();
+    else globalSearch.value = true;
+  } else if (
+    event.key.toLowerCase() === "e" &&
+    store.selected &&
+    taskRoute.value
+  ) {
     event.preventDefault();
     void store.complete(store.selected);
   }
@@ -175,7 +183,7 @@ onUnmounted(() => {
 </script>
 <template>
   <div class="app-shell">
-    <a class="skip-link" href="#main-content">Aller aux tâches</a>
+    <a class="skip-link" href="#main-content">Aller au contenu</a>
     <header class="titlebar">
       <div class="brand"><Check /><strong>TaskFlow</strong></div>
       <span class="titlebar-label">Mon espace de travail</span>
@@ -261,20 +269,23 @@ onUnmounted(() => {
           <button aria-label="Recherche globale" @click="globalSearch = true">
             <Search aria-hidden="true" />Tout rechercher
           </button>
-          <Search /><input
-            ref="search"
-            v-model="store.query"
-            aria-label="Rechercher les tâches"
-            placeholder="Rechercher dans les tâches…"
-          /><kbd>/</kbd
-          ><button
-            v-if="store.query"
-            class="icon-button"
-            aria-label="Effacer la recherche"
-            @click="store.query = ''"
-          >
-            <X />
-          </button>
+          <template v-if="taskRoute">
+            <Search aria-hidden="true" /><input
+              ref="search"
+              v-model="store.query"
+              aria-label="Rechercher les tâches"
+              placeholder="Rechercher dans les tâches…"
+            /><kbd>/</kbd
+            ><button
+              v-if="store.query"
+              class="icon-button"
+              aria-label="Effacer la recherche"
+              @click="store.query = ''"
+            >
+              <X />
+            </button>
+          </template>
+          <kbd v-else>Ctrl Maj F</kbd>
         </div>
         <div
           v-if="store.error && !store.captureOpen && !store.settingsOpen"
