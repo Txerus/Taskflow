@@ -19,6 +19,7 @@ import {
   Square,
   X,
   BookOpen,
+  Mail,
 } from "lucide-vue-next";
 import { useTasks } from "./store";
 import { hostKey } from "./context";
@@ -35,7 +36,10 @@ const store = useTasks(),
   search = ref<HTMLInputElement | null>(null),
   commandQuery = ref("");
 const taskRoute = computed(
-  () => !route.path.startsWith("/notes") && route.path !== "/design",
+  () =>
+    !route.path.startsWith("/notes") &&
+    route.path !== "/mail" &&
+    route.path !== "/design",
 );
 const navigation = [
   { id: "today", label: "Aujourd’hui", icon: Sun },
@@ -46,6 +50,7 @@ const navigation = [
   { id: "matrix", label: "Matrice", icon: Grid2X2 },
   { id: "focus", label: "Focus", icon: Target },
   { id: "notes", label: "Carnets", icon: BookOpen },
+  { id: "mail", label: "Messagerie", icon: Mail },
 ];
 const commands = computed(() =>
   [
@@ -90,7 +95,9 @@ const commands = computed(() =>
 );
 const removeGuard = router.beforeEach((to) => {
   if (
-    (to.path === "/design" || to.path.startsWith("/notes")) &&
+    (to.path === "/design" ||
+      to.path === "/mail" ||
+      to.path.startsWith("/notes")) &&
     store.editorDirty &&
     !store.discardDraft()
   )
@@ -307,6 +314,7 @@ onUnmounted(() => {
         v-if="
           store.selected &&
           route.path !== '/design' &&
+          route.path !== '/mail' &&
           !route.path.startsWith('/notes')
         "
         :task="store.selected"
