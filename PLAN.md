@@ -31,7 +31,7 @@ Les cases de réalisation indiquent le code présent ; les validations natives e
 - [x] Tests Electron : rédaction, redémarrage, recherche, checklist et navigation
 - [x] Revue visuelle clair/sombre, clavier et captures
 - [x] Build Windows, installation et conservation des données Phase 1
-- [ ] Validation utilisateur de Phase 2
+- [x] Validation utilisateur de Phase 2 — accord reçu le 18 septembre 2026
 ## Phase 3 — mails
 - [ ] Identifiants Azure / Google fournis par l’utilisateur
 - [ ] OAuth PKCE loopback, tokens safeStorage
