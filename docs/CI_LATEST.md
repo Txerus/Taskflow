@@ -1,8 +1,8 @@
 # Dernière validation Windows
 
-- État : success
-- Commit testé : 40fb71183df1765277194ce82726af051d4724aa
-- Run : https://github.com/Txerus/Taskflow/actions/runs/35331853641
-- Date UTC : 2026-09-18T09:57:11Z
+- État : cancelled
+- Commit testé : bff502e32c13238724b2701d6bfe3ba949c99a3d
+- Run : https://github.com/Txerus/Taskflow/actions/runs/35332312948
+- Date UTC : 2026-09-18T09:58:51Z
 
 Ce fichier est mis à jour automatiquement par GitHub Actions. Un commit de statut n'est pas une nouvelle version de l'application.
