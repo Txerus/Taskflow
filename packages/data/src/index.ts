@@ -10,6 +10,7 @@ import type {
   MailAccount,
   MailAttachment as CachedMailAttachment,
   MailMessage,
+  MailRule,
   MailWaiting,
 } from "@taskflow/core";
 import type {
@@ -39,6 +40,17 @@ export interface DataStore {
     dueDate: string | null;
   }): Promise<MailWaiting>;
   resolveMailWaiting(id: string): Promise<void>;
+  saveMailRule(input: {
+    id?: string;
+    name: string;
+    enabled: boolean;
+    senderContains: string;
+    subjectContains: string;
+    unreadOnly: boolean;
+    createTask: boolean;
+    priority: 1 | 2 | 3 | 4;
+  }): Promise<MailRule>;
+  deleteMailRule(id: string): Promise<void>;
   notesSnapshot(): Promise<NotesSnapshot>;
   saveNotebook(input: {
     id?: string;
