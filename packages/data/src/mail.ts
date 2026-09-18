@@ -5,12 +5,14 @@ import {
   mailAccountInputSchema,
   mailAttachmentInputSchema,
   mailMessageInputSchema,
+  mailRuleInputSchema,
   mailWaitingInputSchema,
   type MailAccount,
   type MailAttachment,
   type MailMessage,
   type MailMessageInput,
   type MailSnapshot,
+  type MailRule,
   type MailWaiting,
 } from "@taskflow/core";
 
@@ -79,7 +81,89 @@ export class MailRepository {
           resolvedAt: r.resolved_at as string | null,
         }),
       ),
+      rules: (this.db
+        .prepare("SELECT * FROM mail_rules ORDER BY name,id")
+        .all() as Row[]).map((r) => this.rule(r)),
     };
+  }
+
+  private rule(r: Row): MailRule {
+    const conditions = JSON.parse(String(r.conditions_json)) as {
+      senderContains?: string;
+      subjectContains?: string;
+      unreadOnly?: boolean;
+    };
+    const actions = JSON.parse(String(r.actions_json)) as {
+      createTask?: boolean;
+      priority?: 1 | 2 | 3 | 4;
+    };
+    return {
+      id: String(r.id),
+      name: String(r.name),
+      enabled: !!r.enabled,
+      senderContains: conditions.senderContains ?? "",
+      subjectContains: conditions.subjectContains ?? "",
+      unreadOnly: !!conditions.unreadOnly,
+      createTask: actions.createTask !== false,
+      priority: actions.priority ?? 3,
+      createdAt: String(r.created_at),
+      updatedAt: String(r.updated_at),
+    };
+  }
+
+  saveRule(raw: unknown): MailRule {
+    const input = mailRuleInputSchema.parse(raw);
+    const old = input.id
+      ? (this.db.prepare("SELECT * FROM mail_rules WHERE id=?").get(input.id) as
+          | Row
+          | undefined)
+      : undefined;
+    const id = old ? String(old.id) : (input.id ?? randomUUID());
+    const now = new Date().toISOString();
+    const conditions = JSON.stringify({
+      senderContains: input.senderContains,
+      subjectContains: input.subjectContains,
+      unreadOnly: input.unreadOnly,
+    });
+    const actions = JSON.stringify({
+      createTask: input.createTask,
+      priority: input.priority,
+    });
+    if (old)
+      this.db
+        .prepare(
+          "UPDATE mail_rules SET name=?,enabled=?,conditions_json=?,actions_json=?,updated_at=? WHERE id=?",
+        )
+        .run(input.name, +input.enabled, conditions, actions, now, id);
+    else
+      this.db
+        .prepare(
+          "INSERT INTO mail_rules(id,name,enabled,conditions_json,actions_json,created_at,updated_at) VALUES(?,?,?,?,?,?,?)",
+        )
+        .run(id, input.name, +input.enabled, conditions, actions, now, now);
+    return this.rule(
+      this.db.prepare("SELECT * FROM mail_rules WHERE id=?").get(id) as Row,
+    );
+  }
+
+  deleteRule(id: string) {
+    idSchema.parse(id);
+    const info = this.db.prepare("DELETE FROM mail_rules WHERE id=?").run(id);
+    if (!info.changes) throw new Error("Règle mail introuvable.");
+  }
+
+  matchingRules(message: MailMessage) {
+    const sender = message.from.email.toLocaleLowerCase("fr");
+    const subject = message.subject.toLocaleLowerCase("fr");
+    return this.snapshot().rules.filter(
+      (rule) =>
+        rule.enabled &&
+        (!rule.unreadOnly || message.unread) &&
+        (!rule.senderContains ||
+          sender.includes(rule.senderContains.toLocaleLowerCase("fr"))) &&
+        (!rule.subjectContains ||
+          subject.includes(rule.subjectContains.toLocaleLowerCase("fr"))),
+    );
   }
 
   saveAccount(raw: unknown): MailAccount {
