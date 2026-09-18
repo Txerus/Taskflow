@@ -76,3 +76,13 @@ Validation Windows après ces ajouts : run https://github.com/Txerus/Taskflow/ac
 Les deux Client IDs publics fournis par l’utilisateur sont maintenant configurés dans le client desktop TaskFlow, avec possibilité de surcharge par variables d’environnement. Aucun mot de passe, access token, refresh token ou secret confidentiel n’est committé. Google reste en flux Desktop/PKCE loopback ; Microsoft reste en public client/PKCE avec navigateur système.
 
 Prochaine validation requise : build Windows puis test interactif réel de connexion Gmail et Microsoft 365. Cette étape nécessite l’intervention de l’utilisateur dans les pages de consentement des fournisseurs ; elle ne peut pas être simulée comme une validation réelle en CI.
+
+
+## Phase 3 — parcours entreprise et préparation commerciale — 18 septembre 2026
+Le cas réel « approbation administrateur requise » observé sur un tenant Microsoft 365 a été intégré au produit : TaskFlow explique désormais la politique du tenant, fournit à l'IT le nom de l'application, son Client ID et les permissions déléguées demandées. Les erreurs OAuth retournées au callback conservent leur description utile au diagnostic.
+
+Ajout d'une suggestion locale de mail → tâche en français/anglais : heuristique déterministe, score et raisons visibles, aucune transmission du contenu à un fournisseur IA, aucune création automatique sans action de l'utilisateur. Des tests métier couvrent demandes FR/EN, mail informatif et nettoyage du titre.
+
+Le guide docs/COMMERCIAL_OAUTH.md formalise le parcours multi-tenant Microsoft, Publisher Verification/Partner One ID, l'option Entra App Gallery et la vérification Google. Le scope gmail.modify utilisé par TaskFlow est un scope Gmail restricted : la commercialisation Google doit donc passer par la vérification OAuth de production et les exigences applicables indiquées par Verification Center.
+
+Reste à valider par CI Windows ces modifications, puis à obtenir les validations externes éditeur/consentement et effectuer les connexions réelles de production avant de clôturer la Phase 3.
