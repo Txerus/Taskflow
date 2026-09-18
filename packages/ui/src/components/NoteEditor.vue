@@ -110,7 +110,7 @@ const editor = useEditor({
 });
 watch(
   () => props.disabled,
-  (v) => editor.value?.setEditable(!v),
+  (v) => editor.value?.setEditable(!v, false),
 );
 function replace(content: RichNode) {
   editor.value?.commands.setContent(content, { emitUpdate: false });
