@@ -1432,6 +1432,25 @@ legend {
   color: var(--muted);
   font-size: 12px;
 }
+.mail-attachments {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  padding-block: var(--s4);
+  border-bottom: 1px solid var(--line);
+}
+.mail-attachments > strong {
+  width: 100%;
+  font-size: 12px;
+}
+.mail-attachments button {
+  font-size: 12px;
+}
+.mail-attachments small {
+  color: var(--muted);
+}
+
 .mail-body {
   margin: 0;
   padding: var(--s6) 0;
