@@ -34,11 +34,11 @@ Les cases de réalisation indiquent le code présent ; les validations natives e
 - [x] Validation utilisateur de Phase 2 — accord reçu le 18 septembre 2026
 ## Phase 3 — mails
 - [ ] Identifiants Azure / Google fournis par l’utilisateur
-- [ ] OAuth PKCE loopback, tokens safeStorage
-- [ ] Graph / Gmail, lecture, réponse et pièces jointes
-- [ ] Cache hors-ligne et synchronisation
+- [x] OAuth PKCE loopback, tokens safeStorage
+- [x] Graph / Gmail, lecture, réponse et pièces jointes
+- [x] Cache hors-ligne et synchronisation
 - [ ] Mail → tâche, règles et suggestions IA
-- [ ] Attente de réponse et relance
+- [x] Attente de réponse et relance
 - [ ] Connexion autorisée, tests, audits, build et validation
 ## Phase 4 — bonus
 - [ ] Résumé matinal, time-blocking, revue hebdomadaire
