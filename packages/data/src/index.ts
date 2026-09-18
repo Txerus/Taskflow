@@ -88,6 +88,8 @@ export interface DesktopHost {
   }>;
   connectMail(provider: "google" | "microsoft"): Promise<MailAccount>;
   disconnectMail(accountId: string): Promise<void>;
+  syncMail(accountId: string): Promise<number>;
+  replyMail(messageId: string, body: string): Promise<void>;
   captureAttachment(taskId: string): Promise<Attachment | null>;
   openAttachment(id: string): Promise<void>;
   windowAction(action: "minimize" | "maximize" | "close"): Promise<void>;
