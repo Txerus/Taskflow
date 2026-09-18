@@ -20,6 +20,8 @@ const data: DataStore = {
     invoke(c.createTaskFromMail, messageId, input),
   waitForMailReply: (input) => invoke(c.waitForMailReply, input),
   resolveMailWaiting: (id) => invoke(c.resolveMailWaiting, id),
+  saveMailRule: (input) => invoke(c.saveMailRule, input),
+  deleteMailRule: (id) => invoke(c.deleteMailRule, id),
 
   notesSnapshot: () => invoke(c.notesSnapshot),
   saveNotebook: (i) => invoke(c.saveNotebook, i),
