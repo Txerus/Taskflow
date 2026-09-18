@@ -119,6 +119,7 @@ function discard() {
   return true;
 }
 async function openPage(id: string) {
+  if (page.value?.id === id) return;
   if (!discard()) return;
   await router.push("/notes/" + id);
   if (route.params.pageId === id)
@@ -278,13 +279,13 @@ function discardWhileManaging() {
   return true;
 }
 async function remove(k: NoteKind, id: string) {
-  if (!discard()) return;
   if (
     !window.confirm(
       "Supprimer cet élément et son contenu ? Vous pourrez annuler la suppression. Les tâches liées seront conservées.",
     )
   )
     return;
+  if (!discard()) return;
   await run(async () => {
     const item =
       k === "notebook"
@@ -309,6 +310,7 @@ async function undo() {
   });
 }
 function selectNotebook(id: string) {
+  if (notebookId.value === id) return;
   if (!discard()) return;
   notebookId.value = id;
   sectionId.value = sections.value[0]?.id ?? "";
@@ -316,6 +318,7 @@ function selectNotebook(id: string) {
   void router.push("/notes");
 }
 function selectSection(id: string) {
+  if (sectionId.value === id) return;
   if (!discard()) return;
   sectionId.value = id;
   accept(null);
