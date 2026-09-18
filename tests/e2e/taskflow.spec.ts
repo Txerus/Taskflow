@@ -90,6 +90,10 @@ test("carnet, section, page Tiptap, recherche et persistance", async () => {
     name: "Contenu de la page",
     exact: true,
   });
+  await expect(
+    page.getByRole("button", { name: "Choisir une image", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Choose File", { exact: false })).toHaveCount(0);
   await editor.fill("Préparer les essais de qualification.");
   await page
     .getByRole("button", { name: "Enregistrer la page", exact: true })
