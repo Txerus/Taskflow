@@ -17,6 +17,89 @@ describe("documents de pages", () => {
     expect(d.content![0].attrs).toBeUndefined();
     expect(plainText(d)).toBe("Bonjour");
   });
+  it("accepte les blocs Tiptap de Phase 2", () => {
+    const doc = validateDocument({
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 2 },
+          content: [{ type: "text", text: "Compte rendu" }],
+        },
+        {
+          type: "codeBlock",
+          attrs: { language: null },
+          content: [{ type: "text", text: "P1 = urgent" }],
+        },
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  attrs: { colspan: 1, rowspan: 1, colwidth: null },
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [{ type: "text", text: "Action" }],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  attrs: { colspan: 1, rowspan: 1, colwidth: null },
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [{ type: "text", text: "Relancer" }],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: "taskList",
+          content: [
+            {
+              type: "taskItem",
+              attrs: { checked: false },
+              content: [
+                {
+                  type: "paragraph",
+                  content: [{ type: "text", text: "Envoyer le rapport" }],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: "image",
+          attrs: {
+            src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB",
+            alt: "Schéma",
+            title: null,
+          },
+        },
+      ],
+    });
+    expect(doc.content?.map((node) => node.type)).toEqual([
+      "heading",
+      "codeBlock",
+      "table",
+      "taskList",
+      "image",
+    ]);
+    expect(plainText(doc)).toContain("Envoyer le rapport");
+  });
   it("refuse les marques actives et les documents trop profonds", () => {
     expect(() =>
       validateDocument({
