@@ -1,4 +1,5 @@
 import { NotesRepository } from "./notes";
+import { MailRepository } from "./mail";
 import type { NoteKind } from "@taskflow/core";
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
@@ -60,6 +61,38 @@ export class SqliteDataStore implements DataStore {
       (i) => this.insert(i),
       (id, r, i) => this.updateTaskSync(id, r, i),
     );
+  }
+  get mail() {
+    return new MailRepository(this.db);
+  }
+  async mailSnapshot() {
+    return this.mail.snapshot();
+  }
+  async mailAttachments(messageId: string) {
+    return this.mail.attachments(messageId);
+  }
+  async setMailRead(messageId: string, read: boolean) {
+    return this.mail.setRead(messageId, read);
+  }
+  async linkMailTask(messageId: string, taskId: string | null) {
+    return this.mail.linkTask(messageId, taskId);
+  }
+  async createTaskFromMail(messageId: string, input: TaskInput) {
+    return this.db.transaction(() => {
+      const task = this.insert(input);
+      this.mail.linkTask(messageId, task.id);
+      return task;
+    })();
+  }
+  async waitForMailReply(input: {
+    messageId: string;
+    expectedFrom: string;
+    dueDate: string | null;
+  }) {
+    return this.mail.waitForReply(input);
+  }
+  async resolveMailWaiting(id: string) {
+    this.mail.resolveWaiting(id);
   }
   async notesSnapshot() {
     return this.notes.snapshot();
