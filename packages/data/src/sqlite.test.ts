@@ -177,7 +177,13 @@ describe("SQLite", () => {
       dueDate: "2026-09-25",
     });
     expect(waiting.resolvedAt).toBeNull();
-    await store.resolveMailWaiting(waiting.id);
+    const reply = store.mail.upsertMessage({
+      ...raw,
+      providerMessageId: "msg-2",
+      receivedAt: "2026-09-19T08:00:00.000Z",
+      unread: true,
+    });
+    expect(store.mail.resolveMatchingReplies(reply)).toBe(1);
     expect((await store.mailSnapshot()).waiting[0].resolvedAt).not.toBeNull();
   });
 
