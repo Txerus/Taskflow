@@ -76,6 +76,15 @@ const show = () => {
     win.webContents.send(c.capture);
   };
 function registerIpc() {
+  handle(c.notesSnapshot, () => store.notesSnapshot());
+  handle(c.saveNotebook, (i) => store.saveNotebook(i));
+  handle(c.saveSection, (i) => store.saveSection(i));
+  handle(c.savePage, (i) => store.savePage(i));
+  handle(c.deleteNote, (kind, id, r) => store.deleteNote(kind, id, r));
+  handle(c.restoreNote, (token) => store.restoreNote(token));
+  handle(c.linkChecklist, (id, r, item, task) => store.linkChecklist(id, r, item, task));
+  handle(c.searchAll, (q) => store.searchAll(q));
+
   handle(c.snapshot, () => store.snapshot());
   handle(c.createTask, (i) => store.createTask(i));
   handle(c.updateTask, (id, r, i) => store.updateTask(id, r, i));

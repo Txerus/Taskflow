@@ -18,6 +18,7 @@ import {
   Minus,
   Square,
   X,
+  BookOpen,
 } from "lucide-vue-next";
 import { useTasks } from "./store";
 import { hostKey } from "./context";
@@ -25,6 +26,8 @@ import QuickCapture from "./components/QuickCapture.vue";
 import TaskDetail from "./components/TaskDetail.vue";
 import Settings from "./components/Settings.vue";
 import Modal from "./components/Modal.vue";
+import GlobalSearch from "./components/GlobalSearch.vue";
+const globalSearch = ref(false);
 const store = useTasks(),
   host = inject(hostKey, undefined),
   router = useRouter(),
@@ -39,6 +42,7 @@ const navigation = [
   { id: "calendar", label: "Calendrier", icon: CalendarDays },
   { id: "matrix", label: "Matrice", icon: Grid2X2 },
   { id: "focus", label: "Focus", icon: Target },
+  { id: "notes", label: "Carnets", icon: BookOpen },
 ];
 const commands = computed(() =>
   [
@@ -68,6 +72,13 @@ const commands = computed(() =>
     },
     { label: "Annuler la suppression", key: "Ctrl+Z", run: () => store.undo() },
     { label: "Système de design", key: "", run: () => router.push("/design") },
+    {
+      label: "Recherche globale",
+      key: "Ctrl+Maj+F",
+      run: () => {
+        globalSearch.value = true;
+      },
+    },
   ].filter((c) =>
     c.label
       .toLocaleLowerCase("fr")
@@ -75,7 +86,11 @@ const commands = computed(() =>
   ),
 );
 const removeGuard = router.beforeEach((to) => {
-  if (to.path === "/design" && store.editorDirty && !store.discardDraft())
+  if (
+    (to.path === "/design" || to.path.startsWith("/notes")) &&
+    store.editorDirty &&
+    !store.discardDraft()
+  )
     return false;
   return true;
 });
@@ -91,16 +106,31 @@ function applyTheme() {
 watch(() => store.snapshot.preferences.theme, applyTheme, { immediate: true });
 function keyboard(event: KeyboardEvent) {
   const target = event.target as HTMLElement;
-  const editing = target.matches(
+  const editing = !!target.closest(
     "input,textarea,select,[contenteditable=true]",
   );
+  if (
+    (event.ctrlKey || event.metaKey) &&
+    event.shiftKey &&
+    event.key.toLowerCase() === "f"
+  ) {
+    event.preventDefault();
+    globalSearch.value = true;
+    return;
+  }
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
     event.preventDefault();
     store.paletteOpen = !store.paletteOpen;
     commandQuery.value = "";
     return;
   }
-  if (editing || store.captureOpen || store.paletteOpen || store.settingsOpen)
+  if (
+    editing ||
+    globalSearch.value ||
+    store.captureOpen ||
+    store.paletteOpen ||
+    store.settingsOpen
+  )
     return;
   if ((event.ctrlKey || event.metaKey) && event.key === "z") {
     event.preventDefault();
@@ -228,6 +258,9 @@ onUnmounted(() => {
       </aside>
       <main id="main-content" class="main" tabindex="-1">
         <div class="searchbar">
+          <button aria-label="Recherche globale" @click="globalSearch = true">
+            <Search aria-hidden="true" />Tout rechercher
+          </button>
           <Search /><input
             ref="search"
             v-model="store.query"
@@ -260,7 +293,11 @@ onUnmounted(() => {
         <RouterView />
       </main>
       <TaskDetail
-        v-if="store.selected && route.path !== '/design'"
+        v-if="
+          store.selected &&
+          route.path !== '/design' &&
+          !route.path.startsWith('/notes')
+        "
         :task="store.selected"
       />
     </div>
@@ -275,7 +312,9 @@ onUnmounted(() => {
         <X />
       </button>
     </div>
-    <QuickCapture /><Settings /><Modal
+    <GlobalSearch
+      v-model:open="globalSearch"
+    /><QuickCapture /><Settings /><Modal
       v-model:open="store.paletteOpen"
       title="Commandes"
       description="Recherchez une action ou une vue."

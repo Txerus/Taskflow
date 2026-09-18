@@ -7,6 +7,7 @@ import {
   hostKey,
   TaskWorkspace,
   DesignSystem,
+  NotesWorkspace,
 } from "@taskflow/ui";
 import type { DataStore, DesktopHost } from "@taskflow/data";
 import "../../../packages/ui/src/style.css";
@@ -20,6 +21,7 @@ const router = createRouter({
   routes: [
     { path: "/", redirect: "/today" },
     { path: "/design", component: DesignSystem },
+    { path: "/notes/:pageId?", component: NotesWorkspace },
     { path: "/:view", component: TaskWorkspace },
   ],
 });

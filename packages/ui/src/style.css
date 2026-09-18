@@ -1021,3 +1021,289 @@ legend {
     animation: none !important;
   }
 }
+
+/* Notebook pages share TaskFlow's tokens; no remote fonts or image loads. */
+.notes-workspace {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.notes-workspace .view-header {
+  padding-block: var(--s4);
+}
+.notes-layout {
+  display: grid;
+  grid-template-columns: 180px 200px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  border-top: 1px solid var(--line);
+}
+.notes-browser,
+.notes-pages {
+  overflow: auto;
+  padding: var(--s3);
+  border-right: 1px solid var(--line);
+}
+.notes-browser {
+  background: var(--surface);
+}
+.notes-empty {
+  padding: var(--s4) var(--s1);
+  font-size: 13px;
+  color: var(--muted);
+}
+.notebook-title,
+.section-choice,
+.page-choice {
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+  border-color: transparent;
+  background: transparent;
+  overflow-wrap: anywhere;
+}
+.notebook-title {
+  font-weight: 600;
+}
+.section-choice {
+  padding-left: var(--s6);
+  font-size: 13px;
+}
+.notes-layout button[aria-pressed="true"] {
+  background: var(--selected);
+  color: var(--accent);
+}
+.note-tools {
+  display: flex;
+  gap: var(--s1);
+  margin-block: var(--s1) var(--s3);
+}
+.note-tools button {
+  padding: var(--s1);
+  font-size: 12px;
+  background: transparent;
+  border-color: transparent;
+}
+.notebook-group {
+  margin-bottom: var(--s3);
+}
+.notes-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s1);
+}
+.notes-list-heading h2 {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.notes-list-heading button {
+  padding: var(--s1);
+}
+.page-choice {
+  align-items: flex-start;
+  margin-block: var(--s1);
+}
+.page-choice svg {
+  margin-top: var(--s1);
+}
+.page-choice small,
+.search-result small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: var(--s1);
+}
+.note-sheet {
+  overflow: auto;
+  min-width: 0;
+  padding-bottom: var(--s8);
+}
+.note-sheet-header {
+  padding: var(--s4) var(--s6);
+}
+.note-sheet-header input {
+  font-size: 22px;
+  font-weight: 600;
+}
+.note-sheet-header label {
+  margin-top: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
+  margin-top: var(--s3);
+}
+.note-actions span {
+  width: 100%;
+  font-size: 12px;
+}
+.note-actions button,
+.editor-toolbar button {
+  font-size: 12px;
+}
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+  padding: var(--s2) var(--s6);
+  border-block: 1px solid var(--line);
+  background: var(--surface);
+}
+.editor-toolbar button[aria-pressed="true"] {
+  background: var(--selected);
+  color: var(--accent);
+}
+.image-picker {
+  font-size: 12px;
+  margin: var(--s2) var(--s6);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
+}
+.image-picker input {
+  width: auto;
+  max-width: 100%;
+  font-size: 12px;
+}
+.note-editor .tiptap {
+  min-height: 260px;
+  padding: var(--s6);
+  outline-offset: -3px;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.note-editor .tiptap:focus-visible {
+  outline: 2px solid var(--accent);
+}
+.note-editor .tiptap p {
+  margin-block: var(--s2);
+}
+.note-editor .tiptap h1,
+.note-editor .tiptap h2,
+.note-editor .tiptap h3 {
+  margin-block: var(--s4) var(--s2);
+}
+.note-editor .tiptap ul,
+.note-editor .tiptap ol {
+  padding-left: var(--s6);
+  list-style: revert;
+}
+.note-editor .tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+.note-editor .tiptap li[data-type="taskItem"] {
+  display: flex;
+  gap: var(--s2);
+}
+.note-editor .tiptap li[data-type="taskItem"] > label {
+  margin-top: var(--s2);
+  flex-shrink: 0;
+}
+.note-editor .tiptap li[data-type="taskItem"] > div {
+  flex: 1;
+  min-width: 0;
+}
+.note-editor .tiptap pre {
+  white-space: pre-wrap;
+  background: var(--surface);
+  padding: var(--s3);
+  border-radius: var(--radius);
+}
+.note-editor .tiptap code {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+}
+.note-editor .tiptap blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: var(--s4);
+}
+.note-editor .tiptap table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.note-editor .tiptap td,
+.note-editor .tiptap th {
+  border: 1px solid var(--line);
+  padding: var(--s2);
+  vertical-align: top;
+  min-width: 40px;
+}
+.note-editor .tiptap th {
+  background: var(--surface);
+}
+.note-editor .tiptap img {
+  max-width: 100%;
+  height: auto;
+}
+.note-reference {
+  display: inline;
+  min-height: 0;
+  padding: 0 var(--s1);
+  color: var(--accent);
+  background: var(--selected);
+}
+.note-links {
+  border-top: 1px solid var(--line);
+  margin-inline: var(--s6);
+  padding-top: var(--s4);
+}
+.note-links h2 {
+  margin-block: var(--s3) var(--s2);
+  font-size: 14px;
+}
+.note-links p {
+  font-size: 12px;
+  margin-bottom: var(--s2);
+}
+.note-links .inline {
+  flex-wrap: wrap;
+}
+.checklist-link {
+  display: flex;
+  gap: var(--s3);
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-block: var(--s2);
+}
+.checklist-link span {
+  overflow-wrap: anywhere;
+}
+.checklist-link button {
+  flex-shrink: 0;
+  font-size: 12px;
+}
+.notes-undo {
+  padding: var(--s2) var(--s4);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+.search-result {
+  align-items: flex-start;
+  overflow-wrap: anywhere;
+}
+.search-result > span:first-child {
+  min-width: 0;
+}
+@media (max-width: 1279px) {
+  .notes-layout {
+    grid-template-columns: 150px 170px minmax(0, 1fr);
+  }
+  .note-sheet-header,
+  .editor-toolbar,
+  .note-editor .tiptap {
+    padding-inline: var(--s4);
+  }
+}

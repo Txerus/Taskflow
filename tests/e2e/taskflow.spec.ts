@@ -54,7 +54,9 @@ async function dragTask(source: Locator, target: Locator) {
   await page.mouse.down();
   try {
     await page.mouse.move(from.x + 16, from.y + 8, { steps: 5 });
-    await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 10 });
+    await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, {
+      steps: 10,
+    });
     await page.mouse.move(to.x + to.width / 2 + 1, to.y + to.height / 2 + 1);
   } finally {
     await page.mouse.up();
@@ -63,6 +65,193 @@ async function dragTask(source: Locator, target: Locator) {
 async function closeDetail() {
   await page.getByRole("button", { name: "Fermer les détails" }).click();
 }
+async function createNoteElement(name: string) {
+  await page.getByLabel("Nom", { exact: true }).fill(name);
+  await page
+    .getByRole("button", { name: "Créer cet élément", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+}
+test("carnet, section, page Tiptap, recherche et persistance", async () => {
+  await page.getByRole("link", { name: "Carnets", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Nouveau carnet", exact: true })
+    .click();
+  await createNoteElement("Suivi industriel");
+  await page
+    .getByRole("button", { name: "Nouvelle section", exact: true })
+    .click();
+  await createNoteElement("Réunions clients");
+  await page
+    .getByRole("button", { name: "Créer une page", exact: true })
+    .click();
+  await createNoteElement("Réunion de lancement");
+  const editor = page.getByRole("textbox", {
+    name: "Contenu de la page",
+    exact: true,
+  });
+  await editor.fill("Préparer les essais de qualification.");
+  await page
+    .getByRole("button", { name: "Enregistrer la page", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Enregistrer la page", exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Recherche globale", exact: true })
+    .click();
+  await page
+    .getByLabel("Rechercher dans les pages et tâches")
+    .fill("qualification");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: /Réunion de lancement/ })
+    .click();
+  await expect(editor).toContainText("qualification");
+  await app.close();
+  await launch();
+  await page.getByRole("link", { name: "Carnets", exact: true }).click();
+  await page
+    .locator(".page-choice")
+    .filter({ hasText: "Réunion de lancement" })
+    .click();
+  await expect(editor).toContainText("qualification");
+  for (const theme of ["light", "dark"]) {
+    await page.getByRole("button", { name: "Réglages", exact: true }).click();
+    await page.getByLabel("Apparence").selectOption(theme);
+    await page.keyboard.press("Escape");
+    await page.screenshot({ path: `docs/screenshots/notes-${theme}.png` });
+  }
+});
+test("checklist liée, coche depuis tâche et références entre pages", async () => {
+  const ids = await page.evaluate(async () => {
+    const d = window.taskflow.data,
+      n = await d.saveNotebook({ name: "Carnet test" }),
+      s = await d.saveSection({ notebookId: n.id, name: "Actions" });
+    const p = await d.savePage({
+      sectionId: s.id,
+      title: "Actions réunion",
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "taskList",
+            content: [
+              {
+                type: "taskItem",
+                attrs: { checked: false },
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Envoyer le rapport" }],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    });
+    const other = await d.savePage({
+      sectionId: s.id,
+      title: "Contexte",
+      content: { type: "doc", content: [{ type: "paragraph" }] },
+    });
+    return { pageId: p.id, otherId: other.id };
+  });
+  await page.getByRole("link", { name: "Carnets", exact: true }).click();
+  await page
+    .locator(".page-choice")
+    .filter({ hasText: "Actions réunion" })
+    .click();
+  await page
+    .getByRole("button", { name: "Transformer en tâche", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Ouvrir la tâche", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Ouvrir la tâche", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Terminer Envoyer le rapport", exact: true })
+    .click();
+  await page.getByRole("link", { name: "Carnets", exact: true }).click();
+  await page
+    .locator(".page-choice")
+    .filter({ hasText: "Actions réunion" })
+    .click();
+  await expect(page.locator(".tiptap input[type=checkbox]")).toBeChecked();
+  await page.getByRole("button", { name: "[[Page]]", exact: true }).click();
+  await page.getByLabel("Rechercher une référence").fill("Contexte");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Contexte", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Enregistrer la page", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Enregistrer la page", exact: true }),
+  ).toBeDisabled();
+  await page.locator(".note-reference").click();
+  await expect(page.getByLabel("Titre de la page")).toHaveValue("Contexte");
+  const snapshot = await page.evaluate(() => window.taskflow.data.snapshot());
+  expect(snapshot.tasks).toHaveLength(1);
+});
+test("page : brouillon protégé, suppression annulée et contenu actif refusé", async () => {
+  const p = await page.evaluate(async () => {
+    const d = window.taskflow.data,
+      n = await d.saveNotebook({ name: "Protection" }),
+      s = await d.saveSection({ notebookId: n.id, name: "Notes" });
+    return d.savePage({
+      sectionId: s.id,
+      title: "À conserver",
+      content: { type: "doc", content: [{ type: "paragraph" }] },
+    });
+  });
+  await page.getByRole("link", { name: "Carnets", exact: true }).click();
+  await page.locator(".page-choice").filter({ hasText: "À conserver" }).click();
+  await page.getByLabel("Titre de la page").fill("Brouillon");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.getByRole("link", { name: "Liste", exact: true }).click();
+  await expect(page.getByLabel("Titre de la page")).toHaveValue("Brouillon");
+  await page
+    .getByRole("button", { name: "Enregistrer la page", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Enregistrer la page", exact: true }),
+  ).toBeDisabled();
+  page.once("dialog", (dialog) => dialog.accept());
+  await page
+    .getByRole("button", { name: "Supprimer la page", exact: true })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "Annuler la suppression de note",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.locator(".page-choice").filter({ hasText: "Brouillon" }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(async (p) => {
+      try {
+        await window.taskflow.data.savePage({
+          ...p,
+          content: {
+            type: "doc",
+            content: [{ type: "script", text: "alert(1)" }],
+          },
+        });
+        return false;
+      } catch {
+        return true;
+      }
+    }, p),
+  ).toBe(true);
+});
 test("capture française, détail, sous-tâche, commentaire, suppression et annulation", async () => {
   await create("Relancer le client demain 10h #pro !haute");
   await expect(page.getByLabel("Titre", { exact: true })).toHaveValue(
@@ -172,9 +361,13 @@ test("déplacement Kanban, Matrice et calendrier ; récurrence", async () => {
     .getByRole("button", { name: "Terminer Contrôle", exact: true })
     .click();
   await expect(page.locator(".task-row")).toHaveCount(1);
-  await expect.poll(async () =>
-    (await page.evaluate(() => window.taskflow.data.snapshot())).tasks.length,
-  ).toBe(2);
+  await expect
+    .poll(
+      async () =>
+        (await page.evaluate(() => window.taskflow.data.snapshot())).tasks
+          .length,
+    )
+    .toBe(2);
   const snapshot = await page.evaluate(() => window.taskflow.data.snapshot());
   expect(snapshot.tasks).toHaveLength(2);
   expect(snapshot.tasks.filter((t) => t.status === "done")).toHaveLength(1);

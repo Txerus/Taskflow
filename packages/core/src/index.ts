@@ -251,3 +251,5 @@ export function parseQuickTask(
     );
   return { input, tagNames: [...new Set(tagNames)], warnings };
 }
+
+export * from './notes';

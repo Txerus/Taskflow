@@ -24,7 +24,7 @@ describe("SQLite", () => {
     expect((await store.snapshot()).tasks[0].title).toBe("Offre FE141");
     expect(
       store.db.prepare("SELECT * FROM schema_migrations").all(),
-    ).toHaveLength(1);
+    ).toHaveLength(2);
   });
   it("valide DTO et relations", async () => {
     await expect(

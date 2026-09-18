@@ -12,6 +12,15 @@ const subscribe = (channel: string, cb: () => void) => {
   return () => ipcRenderer.removeListener(channel, listener);
 };
 const data: DataStore = {
+  notesSnapshot: () => invoke(c.notesSnapshot),
+  saveNotebook: (i) => invoke(c.saveNotebook, i),
+  saveSection: (i) => invoke(c.saveSection, i),
+  savePage: (i) => invoke(c.savePage, i),
+  deleteNote: (kind, id, r) => invoke(c.deleteNote, kind, id, r),
+  restoreNote: (token) => invoke(c.restoreNote, token),
+  linkChecklist: (id, r, item, task) => invoke(c.linkChecklist, id, r, item, task),
+  searchAll: (q) => invoke(c.searchAll, q),
+
   snapshot: () => invoke(c.snapshot),
   createTask: (i) => invoke(c.createTask, i),
   updateTask: (id, r, i) => invoke(c.updateTask, id, r, i),

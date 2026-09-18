@@ -13,6 +13,9 @@ import type { DataStore, Snapshot } from "@taskflow/data";
 let wrapper: VueWrapper, state: Snapshot, deleted: Task[];
 function data(): DataStore {
   return {
+    notesSnapshot: async()=>({notebooks:[],sections:[],pages:[]}),
+    saveNotebook: async()=>{throw new Error('Unused');}, saveSection: async()=>{throw new Error('Unused');}, savePage: async()=>{throw new Error('Unused');},
+    deleteNote: async()=>{throw new Error('Unused');}, restoreNote: async()=>{}, linkChecklist: async()=>{throw new Error('Unused');}, searchAll:async()=>[],
     snapshot: async () => JSON.parse(JSON.stringify(state)),
     createTask: async (raw) => {
       const t = {

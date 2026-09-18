@@ -1,4 +1,13 @@
 import type {
+  NotesSnapshot,
+  Notebook,
+  NoteSection,
+  NotePage,
+  NoteKind,
+  RichNode,
+  SearchHit,
+} from "@taskflow/core";
+import type {
   Task,
   TaskInput,
   Project,
@@ -14,6 +23,34 @@ export interface Snapshot {
   preferences: Preferences;
 }
 export interface DataStore {
+  notesSnapshot(): Promise<NotesSnapshot>;
+  saveNotebook(input: {
+    id?: string;
+    revision?: number;
+    name: string;
+  }): Promise<Notebook>;
+  saveSection(input: {
+    id?: string;
+    revision?: number;
+    notebookId: string;
+    name: string;
+  }): Promise<NoteSection>;
+  savePage(input: {
+    id?: string;
+    revision?: number;
+    sectionId: string;
+    title: string;
+    content: RichNode;
+  }): Promise<NotePage>;
+  deleteNote(kind: NoteKind, id: string, revision: number): Promise<string>;
+  restoreNote(token: string): Promise<void>;
+  linkChecklist(
+    pageId: string,
+    revision: number,
+    itemId: string,
+    taskId: string | null,
+  ): Promise<NotePage>;
+  searchAll(query: string): Promise<SearchHit[]>;
   snapshot(): Promise<Snapshot>;
   createTask(input: TaskInput): Promise<Task>;
   updateTask(id: string, revision: number, input: TaskInput): Promise<Task>;

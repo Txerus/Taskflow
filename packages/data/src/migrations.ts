@@ -14,4 +14,16 @@ CREATE TABLE attachments(id TEXT PRIMARY KEY,task_id TEXT NOT NULL REFERENCES ta
 CREATE TABLE preferences(key TEXT PRIMARY KEY,value TEXT NOT NULL);
 `,
   },
+  {
+    version: 2,
+    sql: `
+CREATE TABLE notebooks(id TEXT PRIMARY KEY,name TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 1,deleted_at TEXT,delete_token TEXT);
+CREATE TABLE note_sections(id TEXT PRIMARY KEY,notebook_id TEXT NOT NULL REFERENCES notebooks(id),name TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 1,deleted_at TEXT,delete_token TEXT);
+CREATE INDEX note_sections_parent ON note_sections(notebook_id);
+CREATE TABLE note_pages(id TEXT PRIMARY KEY,section_id TEXT NOT NULL REFERENCES note_sections(id),title TEXT NOT NULL,content TEXT NOT NULL,plain_text TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 1,updated_at TEXT NOT NULL,deleted_at TEXT,delete_token TEXT);
+CREATE INDEX note_pages_parent ON note_pages(section_id);
+CREATE TABLE page_checklist(page_id TEXT NOT NULL REFERENCES note_pages(id),item_id TEXT NOT NULL,task_id TEXT NOT NULL REFERENCES tasks(id),PRIMARY KEY(page_id,item_id));
+CREATE INDEX page_checklist_task ON page_checklist(task_id);
+`,
+  },
 ];

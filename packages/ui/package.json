@@ -8,17 +8,24 @@
     "./*": "./src/*"
   },
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
+    "@tailwindcss/vite": "4.3.3",
     "@taskflow/core": "workspace:*",
     "@taskflow/data": "workspace:*",
-    "vue": "3.5.42",
-    "vue-router": "4.6.4",
-    "pinia": "3.0.4",
-    "tailwindcss": "4.3.3",
-    "@tailwindcss/vite": "4.3.3",
-    "reka-ui": "^2.8.0",
-    "lucide-vue-next": "0.577.0",
+    "@tiptap/extension-image": "^3.31.3",
+    "@tiptap/extension-table": "^3.31.3",
+    "@tiptap/extension-task-item": "^3.31.3",
+    "@tiptap/extension-task-list": "^3.31.3",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
+    "@tiptap/vue-3": "^3.31.3",
     "date-fns": "4.1.0",
-    "@fontsource/ibm-plex-sans": "^5.2.8",
-    "@fontsource/ibm-plex-mono": "^5.2.7"
+    "lucide-vue-next": "0.577.0",
+    "pinia": "3.0.4",
+    "reka-ui": "^2.8.0",
+    "tailwindcss": "4.3.3",
+    "vue": "3.5.42",
+    "vue-router": "4.6.4"
   }
 }

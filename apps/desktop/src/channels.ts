@@ -1,4 +1,13 @@
 export const channels = {
+  notesSnapshot: "notes:notesSnapshot",
+  saveNotebook: "notes:saveNotebook",
+  saveSection: "notes:saveSection",
+  savePage: "notes:savePage",
+  deleteNote: "notes:deleteNote",
+  restoreNote: "notes:restoreNote",
+  linkChecklist: "notes:linkChecklist",
+  searchAll: "notes:searchAll",
+
   snapshot: "data:snapshot",
   createTask: "tasks:create",
   updateTask: "tasks:update",

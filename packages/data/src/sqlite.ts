@@ -1,3 +1,5 @@
+import { NotesRepository } from "./notes";
+import type { NoteKind } from "@taskflow/core";
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -50,6 +52,43 @@ export class SqliteDataStore implements DataStore {
             .prepare("INSERT INTO schema_migrations VALUES(?,?)")
             .run(m.version, new Date().toISOString());
         })();
+  }
+  private get notes() {
+    return new NotesRepository(
+      this.db,
+      (id) => this.get(id),
+      (i) => this.insert(i),
+      (id, r, i) => this.updateTaskSync(id, r, i),
+    );
+  }
+  async notesSnapshot() {
+    return this.notes.snapshot();
+  }
+  async saveNotebook(i: Parameters<NotesRepository["saveNotebook"]>[0]) {
+    return this.notes.saveNotebook(i);
+  }
+  async saveSection(i: Parameters<NotesRepository["saveSection"]>[0]) {
+    return this.notes.saveSection(i);
+  }
+  async savePage(i: Parameters<NotesRepository["savePage"]>[0]) {
+    return this.notes.savePage(i);
+  }
+  async deleteNote(kind: NoteKind, id: string, revision: number) {
+    return this.notes.delete(kind, id, revision);
+  }
+  async restoreNote(token: string) {
+    this.notes.restore(token);
+  }
+  async linkChecklist(
+    id: string,
+    r: number,
+    itemId: string,
+    taskId: string | null,
+  ) {
+    return this.notes.linkChecklist(id, r, itemId, taskId);
+  }
+  async searchAll(q: string) {
+    return this.notes.search(q);
   }
   close() {
     this.db.close();
@@ -179,6 +218,9 @@ export class SqliteDataStore implements DataStore {
     revision: number,
     raw: TaskInput,
   ): Promise<Task> {
+    return this.updateTaskSync(id, revision, raw);
+  }
+  private updateTaskSync(id: string, revision: number, raw: TaskInput): Task {
     return this.db.transaction(() => {
       const old = this.get(id);
       z.number().int().positive().parse(revision);
@@ -252,7 +294,9 @@ export class SqliteDataStore implements DataStore {
           id,
         );
       }
-      return this.get(id);
+      const result = this.get(id);
+      this.notes.syncTask(result);
+      return result;
     })();
   }
   async completeTask(id: string, revision: number) {
