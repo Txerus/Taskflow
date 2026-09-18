@@ -44,6 +44,9 @@ const data: DataStore = {
   setPreferences: (i) => invoke(c.setPreferences, i),
 };
 const host: DesktopHost = {
+  mailAuthStatus: () => invoke(c.mailAuthStatus),
+  connectMail: (provider) => invoke(c.connectMail, provider),
+  disconnectMail: (accountId) => invoke(c.disconnectMail, accountId),
   captureAttachment: (id) => invoke(c.captureAttachment, id),
   openAttachment: (id) => invoke(c.openAttachment, id),
   windowAction: (a) => invoke(c.windowAction, a),
