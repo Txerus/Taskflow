@@ -353,6 +353,29 @@ export class MailRepository {
     return this.snapshot().waiting.find((x) => x.id === id)!;
   }
 
+  resolveMatchingReplies(message: MailMessage) {
+    if (!message.threadId) return 0;
+    const rows = this.db
+      .prepare(
+        "SELECT w.id FROM mail_waiting w JOIN mail_messages original ON original.id=w.message_id WHERE w.resolved_at IS NULL AND lower(w.expected_from)=lower(?) AND original.account_id=? AND original.thread_id=? AND original.id<>?",
+      )
+      .all(
+        message.from.email,
+        message.accountId,
+        message.threadId,
+        message.id,
+      ) as { id: string }[];
+    if (!rows.length) return 0;
+    const now = new Date().toISOString();
+    const update = this.db.prepare(
+      "UPDATE mail_waiting SET resolved_at=? WHERE id=? AND resolved_at IS NULL",
+    );
+    this.db.transaction(() => {
+      for (const row of rows) update.run(now, row.id);
+    })();
+    return rows.length;
+  }
+
   resolveWaiting(id: string) {
     idSchema.parse(id);
     const info = this.db
