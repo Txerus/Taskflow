@@ -25,6 +25,10 @@ const auth = ref({
 const dueDate = ref("");
 const replyBody = ref("");
 const attachments = ref<MailAttachment[]>([]);
+const ruleName = ref("");
+const ruleSender = ref("");
+const ruleSubject = ref("");
+const rulePriority = ref<1 | 2 | 3 | 4>(3);
 
 const selected = computed(
   () => snapshot.value.messages.find((m) => m.id === selectedId.value) ?? null,
@@ -63,6 +67,31 @@ async function load() {
   )
     selectedId.value = "";
 }
+async function saveRule() {
+  await run(async () => {
+    await data.saveMailRule({
+      name: ruleName.value,
+      enabled: true,
+      senderContains: ruleSender.value,
+      subjectContains: ruleSubject.value,
+      unreadOnly: false,
+      createTask: true,
+      priority: rulePriority.value,
+    });
+    ruleName.value = "";
+    ruleSender.value = "";
+    ruleSubject.value = "";
+    rulePriority.value = 3;
+    await load();
+  });
+}
+async function deleteRule(id: string) {
+  await run(async () => {
+    await data.deleteMailRule(id);
+    await load();
+  });
+}
+
 async function connect(provider: "google" | "microsoft") {
   if (!host) return;
   await run(async () => {
@@ -210,6 +239,43 @@ onMounted(async () => {
         <p v-if="host && (!auth.googleConfigured || !auth.microsoftConfigured)" class="muted">
           Les boutons sont activés lorsque les identifiants OAuth correspondants sont configurés.
         </p>
+      </section>
+
+      <section class="mail-rules" aria-label="Règles de messagerie">
+        <div class="mail-rules-heading">
+          <div>
+            <h2>Règles automatiques</h2>
+            <p class="muted">Créer une tâche à la synchronisation lorsqu’un e-mail correspond.</p>
+          </div>
+          <span v-if="snapshot.rules.length" class="muted">{{ snapshot.rules.length }} règle(s)</span>
+        </div>
+        <div v-if="snapshot.rules.length" class="mail-rule-list">
+          <div v-for="rule in snapshot.rules" :key="rule.id" class="mail-rule-row">
+            <span>
+              <strong>{{ rule.name }}</strong>
+              <small>
+                {{ rule.senderContains ? 'expéditeur contient « ' + rule.senderContains + ' »' : '' }}
+                {{ rule.senderContains && rule.subjectContains ? ' · ' : '' }}
+                {{ rule.subjectContains ? 'objet contient « ' + rule.subjectContains + ' »' : '' }}
+                · P{{ rule.priority }}
+              </small>
+            </span>
+            <button :disabled="busy" @click="deleteRule(rule.id)">Supprimer</button>
+          </div>
+        </div>
+        <form class="mail-rule-form" @submit.prevent="saveRule">
+          <input v-model.trim="ruleName" required maxlength="100" aria-label="Nom de la règle" placeholder="Nom de la règle" />
+          <input v-model.trim="ruleSender" maxlength="320" aria-label="Expéditeur contient" placeholder="Expéditeur contient…" />
+          <input v-model.trim="ruleSubject" maxlength="500" aria-label="Objet contient" placeholder="Objet contient…" />
+          <label>
+            Priorité
+            <select v-model.number="rulePriority">
+              <option :value="1">P1</option><option :value="2">P2</option>
+              <option :value="3">P3</option><option :value="4">P4</option>
+            </select>
+          </label>
+          <button :disabled="busy || !ruleName || (!ruleSender && !ruleSubject)">Ajouter la règle</button>
+        </form>
       </section>
 
       <div v-if="snapshot.accounts.length" class="mail-layout">
