@@ -70,3 +70,9 @@ Jalon externe restant : fournir/configurer les client IDs OAuth Google et Micros
 Ajout des règles automatiques expéditeur/objet → création de tâche avec priorité, appliquées sans doublon pendant la synchronisation. Le suivi « attendre une réponse » déclenche désormais une notification native à échéance et se clôt automatiquement lorsqu’une réponse du contact attendu arrive dans le même fil Gmail/Graph.
 
 Validation Windows après ces ajouts : run https://github.com/Txerus/Taskflow/actions/runs/35332412903, commit f9ca5db9d4d74bdf24572d9bb9e417ea0974e1e4 : TypeScript, Vitest, Playwright Electron, build NSIS et smoke test Windows réussis. Les appels réels Google/Microsoft restent non testables sans client IDs OAuth. La partie « suggestions IA » n’est pas déclarée terminée : aucun fournisseur IA ni clé API n’a été inventé ou embarqué.
+
+
+## Phase 3 — identifiants OAuth configurés — 18 septembre 2026
+Les deux Client IDs publics fournis par l’utilisateur sont maintenant configurés dans le client desktop TaskFlow, avec possibilité de surcharge par variables d’environnement. Aucun mot de passe, access token, refresh token ou secret confidentiel n’est committé. Google reste en flux Desktop/PKCE loopback ; Microsoft reste en public client/PKCE avec navigateur système.
+
+Prochaine validation requise : build Windows puis test interactif réel de connexion Gmail et Microsoft 365. Cette étape nécessite l’intervention de l’utilisateur dans les pages de consentement des fournisseurs ; elle ne peut pas être simulée comme une validation réelle en CI.
