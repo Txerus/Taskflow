@@ -49,6 +49,8 @@ const host: DesktopHost = {
   disconnectMail: (accountId) => invoke(c.disconnectMail, accountId),
   syncMail: (accountId) => invoke(c.syncMail, accountId),
   replyMail: (messageId, body) => invoke(c.replyMail, messageId, body),
+  openMailAttachment: (messageId, attachmentId) =>
+    invoke(c.openMailAttachment, messageId, attachmentId),
   captureAttachment: (id) => invoke(c.captureAttachment, id),
   openAttachment: (id) => invoke(c.openAttachment, id),
   windowAction: (a) => invoke(c.windowAction, a),
