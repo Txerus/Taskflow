@@ -253,3 +253,5 @@ export function parseQuickTask(
 }
 
 export * from './notes';
+
+export * from './mail';
