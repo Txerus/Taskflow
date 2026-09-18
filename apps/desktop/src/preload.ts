@@ -12,6 +12,15 @@ const subscribe = (channel: string, cb: () => void) => {
   return () => ipcRenderer.removeListener(channel, listener);
 };
 const data: DataStore = {
+  mailSnapshot: () => invoke(c.mailSnapshot),
+  mailAttachments: (id) => invoke(c.mailAttachments, id),
+  setMailRead: (id, read) => invoke(c.setMailRead, id, read),
+  linkMailTask: (messageId, taskId) => invoke(c.linkMailTask, messageId, taskId),
+  createTaskFromMail: (messageId, input) =>
+    invoke(c.createTaskFromMail, messageId, input),
+  waitForMailReply: (input) => invoke(c.waitForMailReply, input),
+  resolveMailWaiting: (id) => invoke(c.resolveMailWaiting, id),
+
   notesSnapshot: () => invoke(c.notesSnapshot),
   saveNotebook: (i) => invoke(c.saveNotebook, i),
   saveSection: (i) => invoke(c.saveSection, i),
