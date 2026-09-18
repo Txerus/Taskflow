@@ -4,7 +4,10 @@ on:
   push:
     branches: [main]
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: taskflow-windows-main
+  cancel-in-progress: true
 jobs:
   windows:
     runs-on: windows-latest
@@ -39,3 +42,29 @@ jobs:
             release/*.blockmap
             playwright-report/
             docs/screenshots/
+      - name: Enregistrer le résultat Windows
+        if: always()
+        shell: pwsh
+        env:
+          TASKFLOW_CI_STATUS: ${{ job.status }}
+          TASKFLOW_CI_SHA: ${{ github.sha }}
+          TASKFLOW_CI_RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          $stamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+          @"
+          # Dernière validation Windows
+
+          - État : $env:TASKFLOW_CI_STATUS
+          - Commit testé : `$env:TASKFLOW_CI_SHA`
+          - Run : $env:TASKFLOW_CI_RUN
+          - Date UTC : $stamp
+
+          Ce fichier est mis à jour automatiquement par GitHub Actions. Un commit de statut n'est pas une nouvelle version de l'application.
+          "@ | Set-Content -Encoding utf8 docs/CI_LATEST.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/CI_LATEST.md
+          if (git diff --cached --quiet) { exit 0 }
+          git commit -m "ci: record Windows validation [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
