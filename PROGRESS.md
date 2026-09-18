@@ -64,3 +64,9 @@ Fournisseurs : synchronisation des 100 messages récents, lecture texte hors lig
 Validation CI : run https://github.com/Txerus/Taskflow/actions/runs/35331853641 sur le commit 40fb71183df1765277194ce82726af051d4724aa. TypeScript, 56 tests Vitest, 9 parcours Electron, build NSIS et smoke test installation/lancement Windows réussis. Artefact TaskFlow-Windows produit. Cette validation couvre le code et les régressions hors connexion ; elle ne constitue pas une validation réelle des API Gmail/Graph.
 
 Jalon externe restant : fournir/configurer les client IDs OAuth Google et Microsoft, puis effectuer une connexion réelle sur chaque fournisseur pour valider consentement, synchronisation, réponse et pièces jointes. Les règles mail, suggestions IA et relances automatiques restent à développer après ce jalon ou en parallèle sans prétendre valider les fournisseurs.
+
+
+## Phase 3 — règles et relances — 18 septembre 2026
+Ajout des règles automatiques expéditeur/objet → création de tâche avec priorité, appliquées sans doublon pendant la synchronisation. Le suivi « attendre une réponse » déclenche désormais une notification native à échéance et se clôt automatiquement lorsqu’une réponse du contact attendu arrive dans le même fil Gmail/Graph.
+
+Validation Windows après ces ajouts : run https://github.com/Txerus/Taskflow/actions/runs/35332412903, commit f9ca5db9d4d74bdf24572d9bb9e417ea0974e1e4 : TypeScript, Vitest, Playwright Electron, build NSIS et smoke test Windows réussis. Les appels réels Google/Microsoft restent non testables sans client IDs OAuth. La partie « suggestions IA » n’est pas déclarée terminée : aucun fournisseur IA ni clé API n’a été inventé ou embarqué.
