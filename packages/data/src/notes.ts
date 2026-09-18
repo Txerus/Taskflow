@@ -182,15 +182,31 @@ export class NotesRepository {
         if (n.type === "taskItem" && n.attrs?.itemId === itemId) item = n;
       });
       if (!item) throw new Error("Enregistrez la checklist avant de la lier.");
-      const existing = this.db
+      let existing = this.db
         .prepare(
           "SELECT task_id FROM page_checklist WHERE page_id=? AND item_id=?",
         )
         .get(pageId, itemId) as { task_id: string } | undefined;
       if (existing) {
-        if (taskId && taskId !== existing.task_id)
-          throw new Error("Cet élément est déjà lié.");
-        return this.page(row);
+        try {
+          this.task(existing.task_id);
+          if (taskId && taskId !== existing.task_id)
+            throw new Error("Cet élément est déjà lié.");
+          return this.page(row);
+        } catch (error) {
+          if (
+            error instanceof Error &&
+            error.message === "Cet élément est déjà lié."
+          )
+            throw error;
+          this.db
+            .prepare(
+              "DELETE FROM page_checklist WHERE page_id=? AND item_id=?",
+            )
+            .run(pageId, itemId);
+          item.attrs = { ...item.attrs, taskId: null };
+          existing = undefined;
+        }
       }
       const task = taskId
         ? this.task(taskId)
