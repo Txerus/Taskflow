@@ -7,6 +7,7 @@ import type {
   RichNode,
   SearchHit,
   MailSnapshot,
+  MailAccount,
   MailAttachment as CachedMailAttachment,
   MailMessage,
   MailWaiting,
@@ -80,6 +81,13 @@ export interface DataStore {
   setPreferences(input: Preferences): Promise<Preferences>;
 }
 export interface DesktopHost {
+  mailAuthStatus(): Promise<{
+    googleConfigured: boolean;
+    microsoftConfigured: boolean;
+    encryptionAvailable: boolean;
+  }>;
+  connectMail(provider: "google" | "microsoft"): Promise<MailAccount>;
+  disconnectMail(accountId: string): Promise<void>;
   captureAttachment(taskId: string): Promise<Attachment | null>;
   openAttachment(id: string): Promise<void>;
   windowAction(action: "minimize" | "maximize" | "close"): Promise<void>;
