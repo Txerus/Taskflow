@@ -187,6 +187,18 @@ test("checklist liée, coche depuis tâche et références entre pages", async (
     .filter({ hasText: "Actions réunion" })
     .click();
   await expect(page.locator(".tiptap input[type=checkbox]")).toBeChecked();
+  const statusBeforeShortcut = (
+    await page.evaluate(() => window.taskflow.data.snapshot())
+  ).tasks[0].status;
+  await page.keyboard.press("e");
+  expect(
+    (await page.evaluate(() => window.taskflow.data.snapshot())).tasks[0].status,
+  ).toBe(statusBeforeShortcut);
+  await page.keyboard.press("/");
+  await expect(
+    page.getByRole("dialog", { name: "Recherche globale" }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "[[Page]]", exact: true }).click();
   await page.getByLabel("Rechercher une référence").fill("Contexte");
   await page
