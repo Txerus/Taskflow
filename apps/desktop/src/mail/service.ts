@@ -1,5 +1,10 @@
 import type { SqliteDataStore } from "../../../../packages/data/src/sqlite";
-import type { MailAccount, MailAddress, MailMessage } from "@taskflow/core";
+import {
+  taskInputSchema,
+  type MailAccount,
+  type MailAddress,
+  type MailMessage,
+} from "@taskflow/core";
 import { MailOAuth } from "./oauth";
 
 type GmailPart = {
@@ -158,6 +163,27 @@ export class MailService {
     return account;
   }
 
+  private async applyRules(message: MailMessage) {
+    if (message.folder !== "inbox" || message.taskId) return;
+    const rule = this.store.mail
+      .matchingRules(message)
+      .find((r) => r.createTask);
+    if (!rule) return;
+    await this.store.createTaskFromMail(
+      message.id,
+      taskInputSchema.parse({
+        title: `E-mail : ${message.subject || "(sans objet)"}`,
+        description: [
+          `Règle mail : ${rule.name}`,
+          `De : ${message.from.name || message.from.email} <${message.from.email}>`,
+          "",
+          message.snippet || message.bodyText.slice(0, 1000),
+        ].join("\n"),
+        priority: rule.priority,
+      }),
+    );
+  }
+
   async sync(accountId: string) {
     const account = this.account(accountId);
     const token = await this.oauth.accessToken(accountId);
@@ -211,6 +237,7 @@ export class MailService {
         folder: (m.labelIds ?? []).includes("SENT") ? "sent" : "inbox",
       });
       this.store.mail.replaceAttachments(saved.id, gmailAttachments(m.payload));
+      await this.applyRules(saved);
       count++;
     }
     return count;
@@ -300,6 +327,7 @@ export class MailService {
             })),
         );
       } else this.store.mail.replaceAttachments(saved.id, []);
+      await this.applyRules(saved);
     }
     return result.value.length;
   }
