@@ -13,6 +13,13 @@ import type { DataStore, Snapshot } from "@taskflow/data";
 let wrapper: VueWrapper, state: Snapshot, deleted: Task[];
 function data(): DataStore {
   return {
+    mailSnapshot: async () => ({ accounts: [], messages: [], waiting: [] }),
+    mailAttachments: async () => [],
+    setMailRead: async () => { throw new Error("Unused"); },
+    linkMailTask: async () => { throw new Error("Unused"); },
+    createTaskFromMail: async () => { throw new Error("Unused"); },
+    waitForMailReply: async () => { throw new Error("Unused"); },
+    resolveMailWaiting: async () => {},
     notesSnapshot: async()=>({notebooks:[],sections:[],pages:[]}),
     saveNotebook: async()=>{throw new Error('Unused');}, saveSection: async()=>{throw new Error('Unused');}, savePage: async()=>{throw new Error('Unused');},
     deleteNote: async()=>{throw new Error('Unused');}, restoreNote: async()=>{}, linkChecklist: async()=>{throw new Error('Unused');}, searchAll:async()=>[],
