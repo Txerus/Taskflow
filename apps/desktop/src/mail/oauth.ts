@@ -225,11 +225,15 @@ export class MailOAuth {
           return;
         }
         const error = url.searchParams.get("error");
+        const errorDescription = url.searchParams.get("error_description");
         const code = url.searchParams.get("code");
         if (error || !code) {
           res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
-          res.end("Connexion TaskFlow annulée. Vous pouvez fermer cet onglet.");
-          finish(new Error("Connexion mail annulée ou refusée."));
+          res.end("Connexion TaskFlow annulée ou refusée. Vous pouvez fermer cet onglet.");
+          const detail = (errorDescription || error || "autorisation refusée")
+            .replace(/[\r\n]+/g, " ")
+            .slice(0, 1000);
+          finish(new Error(`Connexion Microsoft/Google refusée : ${detail}`));
           return;
         }
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
