@@ -26,9 +26,11 @@ import { autoUpdater } from "electron-updater";
 import { SqliteDataStore } from "../../../packages/data/src/sqlite";
 import { preferencesSchema } from "@taskflow/core";
 import { channels as c } from "./channels";
+import { MailOAuth } from "./mail/oauth";
 let win: BrowserWindow,
   tray: Tray,
   store: SqliteDataStore,
+  mailOAuth: MailOAuth,
   quitting = false,
   timer: ReturnType<typeof setInterval>;
 app.setName("TaskFlow");
@@ -76,6 +78,9 @@ const show = () => {
     win.webContents.send(c.capture);
   };
 function registerIpc() {
+  handle(c.mailAuthStatus, () => mailOAuth.status());
+  handle(c.connectMail, (provider) => mailOAuth.connect(provider));
+  handle(c.disconnectMail, (accountId) => mailOAuth.disconnect(accountId));
   handle(c.mailSnapshot, () => store.mailSnapshot());
   handle(c.mailAttachments, (id) => store.mailAttachments(id));
   handle(c.setMailRead, (id, read) => store.setMailRead(id, read));
@@ -218,6 +223,7 @@ else {
     .then(async () => {
       mkdirSync(app.getPath("userData"), { recursive: true });
       store = new SqliteDataStore(join(app.getPath("userData"), "taskflow.db"));
+      mailOAuth = new MailOAuth(store, app.getPath("userData"));
       win = new BrowserWindow({
         width: 1440,
         height: 900,
