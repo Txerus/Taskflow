@@ -19,6 +19,7 @@ import {
   unlinkSync,
   statSync,
   existsSync,
+  writeFileSync,
   constants,
 } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -144,6 +145,30 @@ function registerIpc() {
     ]),
     directory = join(app.getPath("userData"), "attachments");
   mkdirSync(directory, { recursive: true });
+  const mailDirectory = join(app.getPath("userData"), "mail-attachments");
+  mkdirSync(mailDirectory, { recursive: true });
+  handle(c.openMailAttachment, async (messageId, attachmentId) => {
+    const { meta, bytes } = await mailService.attachment(messageId, attachmentId);
+    const extension = extname(meta.name).toLowerCase();
+    if (!allowed.has(extension))
+      throw new Error(
+        "Ce type de pièce jointe n’est pas ouvert directement par TaskFlow.",
+      );
+    if (bytes.length > 25 * 1024 * 1024)
+      throw new Error("La pièce jointe dépasse 25 Mo.");
+    const result = await dialog.showMessageBox(win, {
+      type: "question",
+      message: `Ouvrir « ${meta.name} » avec votre application par défaut ?`,
+      buttons: ["Annuler", "Ouvrir"],
+      defaultId: 0,
+      cancelId: 0,
+    });
+    if (result.response !== 1) return;
+    const dest = join(mailDirectory, randomUUID() + extension);
+    writeFileSync(dest, bytes, { flag: "wx" });
+    const openError = await shell.openPath(dest);
+    if (openError) throw new Error(openError);
+  });
   handle(c.captureAttachment, async (taskId) => {
     await store.attachments(taskId);
     const result = await dialog.showOpenDialog(win, {
