@@ -127,6 +127,42 @@ export class MailOAuth {
     await rm(await this.tokenPath(accountId), { force: true });
   }
 
+  async accessToken(accountId: string) {
+    const current = await this.loadTokens(accountId);
+    if (current.expiresAt > Date.now() + 60_000) return current.accessToken;
+    if (!current.refreshToken)
+      throw new Error("La session mail a expiré. Reconnectez ce compte.");
+    const config = configs()[current.provider];
+    if (!config.clientId)
+      throw new Error("L’identifiant OAuth de ce fournisseur n’est plus configuré.");
+    const form = new URLSearchParams({
+      client_id: config.clientId,
+      refresh_token: current.refreshToken,
+      grant_type: "refresh_token",
+    });
+    if (current.provider === "microsoft")
+      form.set("scope", config.scopes.join(" "));
+    if (config.clientSecret) form.set("client_secret", config.clientSecret);
+    const refreshed = await json<{
+      access_token: string;
+      refresh_token?: string;
+      expires_in?: number;
+      scope?: string;
+    }>(config.token, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: form,
+    });
+    await this.saveTokens(accountId, {
+      ...current,
+      accessToken: refreshed.access_token,
+      refreshToken: refreshed.refresh_token ?? current.refreshToken,
+      expiresAt: Date.now() + Math.max(60, refreshed.expires_in ?? 3600) * 1000,
+      scope: refreshed.scope ?? current.scope,
+    });
+    return refreshed.access_token;
+  }
+
   async connect(provider: MailProvider): Promise<MailAccount> {
     const config = configs()[provider];
     if (!config.clientId)
