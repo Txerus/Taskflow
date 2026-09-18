@@ -107,6 +107,7 @@ test("carnet, section, page Tiptap, recherche et persistance", async () => {
     .getByRole("dialog")
     .getByRole("button", { name: /Réunion de lancement/ })
     .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(editor).toContainText("qualification");
   await app.close();
   await launch();
