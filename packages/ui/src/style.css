@@ -1562,3 +1562,61 @@ legend {
     padding: var(--s4);
   }
 }
+
+
+.mail-enterprise-help,
+.mail-action-suggestion {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.mail-enterprise-help {
+  margin: 0 var(--s6) var(--s3);
+  padding: var(--s3) var(--s4);
+  border-left: 3px solid var(--accent);
+}
+.mail-enterprise-help > svg,
+.mail-action-suggestion > svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.mail-enterprise-help p {
+  margin: var(--s1) 0 0;
+  line-height: 1.45;
+}
+.mail-enterprise-help code {
+  user-select: all;
+  overflow-wrap: anywhere;
+}
+.mail-enterprise-note {
+  margin: var(--s2) 0 0;
+}
+.mail-action-suggestion {
+  align-items: center;
+  padding: var(--s3);
+  margin-bottom: var(--s4);
+  border-radius: var(--radius);
+}
+.mail-action-suggestion > div {
+  flex: 1;
+  min-width: 0;
+}
+.mail-action-suggestion p {
+  margin: 2px 0;
+}
+.mail-action-suggestion small {
+  color: var(--muted);
+}
+@media (max-width: 1279px) {
+  .mail-enterprise-help {
+    margin-inline: var(--s4);
+  }
+  .mail-action-suggestion {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+}
