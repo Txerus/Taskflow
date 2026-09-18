@@ -216,8 +216,32 @@ test("page : brouillon protégé, suppression annulée et contenu actif refusé"
     });
   });
   await page.getByRole("link", { name: "Carnets", exact: true }).click();
-  await page.locator(".page-choice").filter({ hasText: "À conserver" }).click();
+  const currentPageChoice = page
+    .locator(".page-choice")
+    .filter({ hasText: "À conserver" });
+  await currentPageChoice.click();
   await page.getByLabel("Titre de la page").fill("Brouillon");
+  let unexpectedDialog = false;
+  const noOpDialog = async (dialog: import("@playwright/test").Dialog) => {
+    unexpectedDialog = true;
+    await dialog.dismiss();
+  };
+  page.on("dialog", noOpDialog);
+  await currentPageChoice.click();
+  await page.waitForTimeout(50);
+  page.off("dialog", noOpDialog);
+  expect(unexpectedDialog).toBe(false);
+  await expect(
+    page.getByRole("button", { name: "Enregistrer la page", exact: true }),
+  ).toBeEnabled();
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page
+    .getByRole("button", { name: "Supprimer la page", exact: true })
+    .click();
+  await expect(page.getByLabel("Titre de la page")).toHaveValue("Brouillon");
+  await expect(
+    page.getByRole("button", { name: "Enregistrer la page", exact: true }),
+  ).toBeEnabled();
   page.once("dialog", (dialog) => dialog.dismiss());
   await page.getByRole("link", { name: "Liste", exact: true }).click();
   await expect(page.getByLabel("Titre de la page")).toHaveValue("Brouillon");
