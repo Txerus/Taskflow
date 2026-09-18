@@ -121,11 +121,28 @@ test("carnet, section, page Tiptap, recherche et persistance", async () => {
     exact: true,
   });
   await expect(reloadedEditor).toContainText("qualification");
-  for (const theme of ["light", "dark"]) {
-    await page.getByRole("button", { name: "Réglages", exact: true }).click();
-    await page.getByLabel("Apparence").selectOption(theme);
-    await page.keyboard.press("Escape");
-    await page.screenshot({ path: `docs/screenshots/notes-${theme}.png` });
+  for (const [width, height] of [
+    [1280, 800],
+    [1920, 1080],
+  ]) {
+    await app.evaluate(
+      ({ BrowserWindow }, size) =>
+        BrowserWindow.getAllWindows()[0].setSize(size.width, size.height),
+      { width, height },
+    );
+    for (const theme of ["light", "dark"]) {
+      await page.getByRole("button", { name: "Réglages", exact: true }).click();
+      await page.getByLabel("Apparence").selectOption(theme);
+      await page.keyboard.press("Escape");
+      await page.screenshot({
+        path: `docs/screenshots/notes-${theme}-${width}.png`,
+      });
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    }
   }
 });
 test("checklist liée, coche depuis tâche et références entre pages", async () => {
