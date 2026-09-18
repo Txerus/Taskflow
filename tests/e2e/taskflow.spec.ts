@@ -115,7 +115,11 @@ test("carnet, section, page Tiptap, recherche et persistance", async () => {
     .locator(".page-choice")
     .filter({ hasText: "Réunion de lancement" })
     .click();
-  await expect(editor).toContainText("qualification");
+  const reloadedEditor = page.getByRole("textbox", {
+    name: "Contenu de la page",
+    exact: true,
+  });
+  await expect(reloadedEditor).toContainText("qualification");
   for (const theme of ["light", "dark"]) {
     await page.getByRole("button", { name: "Réglages", exact: true }).click();
     await page.getByLabel("Apparence").selectOption(theme);
