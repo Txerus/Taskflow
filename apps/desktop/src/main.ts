@@ -25,7 +25,7 @@ import {
 import { randomUUID } from "node:crypto";
 import { autoUpdater } from "electron-updater";
 import { SqliteDataStore } from "../../../packages/data/src/sqlite";
-import { preferencesSchema } from "@taskflow/core";
+import { localDay, preferencesSchema } from "@taskflow/core";
 import { channels as c } from "./channels";
 import { MailOAuth } from "./mail/oauth";
 import { MailService } from "./mail/service";
@@ -226,6 +226,29 @@ function registerIpc() {
   });
 }
 const pendingNotices = new Set<string>();
+const pendingMailWaitingNotices = new Set<string>();
+function checkMailWaiting() {
+  if (!Notification.isSupported()) return;
+  const today = localDay(new Date());
+  for (const waiting of store.mail
+    .snapshot()
+    .waiting.filter(
+      (w) =>
+        !w.resolvedAt &&
+        !!w.dueDate &&
+        w.dueDate <= today &&
+        !pendingMailWaitingNotices.has(w.id),
+    )) {
+    pendingMailWaitingNotices.add(waiting.id);
+    const message = store.mail.getMessage(waiting.messageId);
+    const n = new Notification({
+      title: "TaskFlow · relance e-mail",
+      body: `Réponse attendue de ${waiting.expectedFrom} · ${message.subject || "(sans objet)"}`,
+    });
+    n.on("click", show);
+    n.show();
+  }
+}
 function checkReminders() {
   if (!Notification.isSupported()) return;
   for (const t of store.dueReminders()) {
@@ -309,8 +332,14 @@ else {
       win.show();
       if (!globalShortcut.register("CommandOrControl+Shift+Space", capture))
         console.warn("Raccourci déjà utilisé par une autre application.");
-      timer = setInterval(checkReminders, 15000);
-      if (!testing) checkReminders();
+      timer = setInterval(() => {
+        checkReminders();
+        checkMailWaiting();
+      }, 15000);
+      if (!testing) {
+        checkReminders();
+        checkMailWaiting();
+      }
       autoUpdater.autoDownload = false;
       autoUpdater.autoInstallOnAppQuit = false;
       autoUpdater.on("error", (e) => console.error("Mise à jour", e.message));
