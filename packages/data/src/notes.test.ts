@@ -119,6 +119,31 @@ describe("carnets SQLite", () => {
     await store.savePage(updated);
     expect((await store.snapshot()).tasks[0].status).toBe("todo");
   });
+  it("recrée un lien si la tâche liée a été supprimée", async () => {
+    const { p } = await fixture();
+    const saved = await store.savePage({ ...p, content: checkDoc() });
+    const itemId = saved.content.content![0].content![0].attrs!.itemId;
+    const linked = await store.linkChecklist(
+      saved.id,
+      saved.revision,
+      itemId,
+      null,
+    );
+    const firstTask = (await store.snapshot()).tasks[0];
+    await store.deleteTask(firstTask.id);
+    const relinked = await store.linkChecklist(
+      linked.id,
+      linked.revision,
+      itemId,
+      null,
+    );
+    const tasks = (await store.snapshot()).tasks;
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0].id).not.toBe(firstTask.id);
+    expect(relinked.content.content![0].content![0].attrs!.taskId).toBe(
+      tasks[0].id,
+    );
+  });
   it("lie une tâche existante sans en créer une autre", async () => {
     const { p } = await fixture();
     const t = await store.createTask(
