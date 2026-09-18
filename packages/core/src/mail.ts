@@ -167,3 +167,68 @@ export const mailReplySchema = z
   })
   .strict();
 export type MailReply = z.infer<typeof mailReplySchema>;
+
+
+export interface MailActionSuggestion {
+  actionable: boolean;
+  confidence: number;
+  reasons: string[];
+  suggestedTitle: string;
+}
+
+/**
+ * Détection locale et déterministe d'une demande dans un e-mail.
+ * Aucun contenu n'est envoyé à un service tiers. Cette suggestion assiste
+ * l'utilisateur mais ne crée jamais une tâche automatiquement.
+ */
+export function detectMailAction(input: {
+  subject: string;
+  bodyText: string;
+}): MailActionSuggestion {
+  const subject = input.subject.trim();
+  const body = input.bodyText.replace(/\s+/g, " ").trim();
+  const text = `${subject} ${body}`.toLocaleLowerCase("fr-FR");
+  const reasons: string[] = [];
+  let score = 0;
+
+  const requestPatterns = [
+    /\b(peux[- ]tu|pouvez[- ]vous|pourrais[- ]tu|pourriez[- ]vous|merci de|merci d['’]|veuillez|j['’]ai besoin|il faudrait)\b/i,
+    /\b(can you|could you|would you|please|need you to|would like you to)\b/i,
+  ];
+  const deadlinePatterns = [
+    /\b(avant|d['’]ici|pour le|au plus tard|échéance|deadline)\b/i,
+    /\b(by|before|due|deadline|asap)\b/i,
+  ];
+  const actionPatterns = [
+    /\b(envoyer|répondre|valider|confirmer|vérifier|préparer|mettre à jour|planifier|appeler|transmettre|retourner|compléter|signer)\b/i,
+    /\b(send|reply|confirm|check|review|prepare|update|schedule|call|complete|sign)\b/i,
+  ];
+
+  if (requestPatterns.some((p) => p.test(text))) {
+    score += 0.48;
+    reasons.push("demande explicite");
+  }
+  if (actionPatterns.some((p) => p.test(text))) {
+    score += 0.3;
+    reasons.push("action identifiable");
+  }
+  if (deadlinePatterns.some((p) => p.test(text))) {
+    score += 0.18;
+    reasons.push("échéance mentionnée");
+  }
+  if (/\?/.test(body)) {
+    score += 0.08;
+    reasons.push("question adressée");
+  }
+
+  const confidence = Math.min(1, Math.round(score * 100) / 100);
+  const cleanSubject = subject.replace(/^(re|fw|fwd)\s*:\s*/i, "").trim();
+  return {
+    actionable: confidence >= 0.45,
+    confidence,
+    reasons,
+    suggestedTitle: cleanSubject
+      ? `Traiter : ${cleanSubject.slice(0, 180)}`
+      : "Traiter la demande reçue par e-mail",
+  };
+}
