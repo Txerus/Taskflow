@@ -26,4 +26,19 @@ CREATE TABLE page_checklist(page_id TEXT NOT NULL REFERENCES note_pages(id),item
 CREATE INDEX page_checklist_task ON page_checklist(task_id);
 `,
   },
+  {
+    version: 3,
+    sql: `
+CREATE TABLE mail_accounts(id TEXT PRIMARY KEY,provider TEXT NOT NULL CHECK(provider IN('google','microsoft')),email TEXT NOT NULL COLLATE NOCASE,display_name TEXT NOT NULL DEFAULT '',last_sync_at TEXT,sync_cursor TEXT,created_at TEXT NOT NULL,UNIQUE(provider,email));
+CREATE TABLE mail_messages(id TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES mail_accounts(id) ON DELETE CASCADE,provider_message_id TEXT NOT NULL,thread_id TEXT,internet_message_id TEXT,subject TEXT NOT NULL DEFAULT '',sender_name TEXT NOT NULL DEFAULT '',sender_email TEXT NOT NULL,to_json TEXT NOT NULL DEFAULT '[]',cc_json TEXT NOT NULL DEFAULT '[]',received_at TEXT NOT NULL,sent_at TEXT,snippet TEXT NOT NULL DEFAULT '',body_text TEXT NOT NULL DEFAULT '',unread INTEGER NOT NULL CHECK(unread IN(0,1)),has_attachments INTEGER NOT NULL CHECK(has_attachments IN(0,1)),folder TEXT NOT NULL CHECK(folder IN('inbox','sent','archive','other')),task_id TEXT REFERENCES tasks(id),synced_at TEXT NOT NULL,UNIQUE(account_id,provider_message_id));
+CREATE INDEX mail_messages_account_received ON mail_messages(account_id,received_at DESC);
+CREATE INDEX mail_messages_unread ON mail_messages(account_id,unread,received_at DESC);
+CREATE INDEX mail_messages_task ON mail_messages(task_id);
+CREATE TABLE mail_attachments(id TEXT PRIMARY KEY,message_id TEXT NOT NULL REFERENCES mail_messages(id) ON DELETE CASCADE,provider_attachment_id TEXT NOT NULL,name TEXT NOT NULL,mime_type TEXT NOT NULL,size INTEGER NOT NULL CHECK(size>=0),UNIQUE(message_id,provider_attachment_id));
+CREATE INDEX mail_attachments_message ON mail_attachments(message_id);
+CREATE TABLE mail_waiting(id TEXT PRIMARY KEY,message_id TEXT NOT NULL UNIQUE REFERENCES mail_messages(id) ON DELETE CASCADE,expected_from TEXT NOT NULL COLLATE NOCASE,due_date TEXT,created_at TEXT NOT NULL,resolved_at TEXT);
+CREATE INDEX mail_waiting_open ON mail_waiting(resolved_at,due_date);
+CREATE TABLE mail_rules(id TEXT PRIMARY KEY,name TEXT NOT NULL,enabled INTEGER NOT NULL CHECK(enabled IN(0,1)),conditions_json TEXT NOT NULL,actions_json TEXT NOT NULL,created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
+`,
+  },
 ];
