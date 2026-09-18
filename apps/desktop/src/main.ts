@@ -27,10 +27,12 @@ import { SqliteDataStore } from "../../../packages/data/src/sqlite";
 import { preferencesSchema } from "@taskflow/core";
 import { channels as c } from "./channels";
 import { MailOAuth } from "./mail/oauth";
+import { MailService } from "./mail/service";
 let win: BrowserWindow,
   tray: Tray,
   store: SqliteDataStore,
   mailOAuth: MailOAuth,
+  mailService: MailService,
   quitting = false,
   timer: ReturnType<typeof setInterval>;
 app.setName("TaskFlow");
@@ -81,6 +83,8 @@ function registerIpc() {
   handle(c.mailAuthStatus, () => mailOAuth.status());
   handle(c.connectMail, (provider) => mailOAuth.connect(provider));
   handle(c.disconnectMail, (accountId) => mailOAuth.disconnect(accountId));
+  handle(c.syncMail, (accountId) => mailService.sync(accountId));
+  handle(c.replyMail, (messageId, body) => mailService.reply(messageId, body));
   handle(c.mailSnapshot, () => store.mailSnapshot());
   handle(c.mailAttachments, (id) => store.mailAttachments(id));
   handle(c.setMailRead, (id, read) => store.setMailRead(id, read));
@@ -224,6 +228,7 @@ else {
       mkdirSync(app.getPath("userData"), { recursive: true });
       store = new SqliteDataStore(join(app.getPath("userData"), "taskflow.db"));
       mailOAuth = new MailOAuth(store, app.getPath("userData"));
+      mailService = new MailService(store, mailOAuth);
       win = new BrowserWindow({
         width: 1440,
         height: 900,
