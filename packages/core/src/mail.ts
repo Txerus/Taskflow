@@ -2,7 +2,7 @@ import { z } from "zod";
 const mailIdSchema = z.string().uuid();
 const mailDaySchema = z
   .string()
-  .regex(/^\\d{4}-\\d{2}-\\d{2}$/)
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
   .refine((s) => {
     const d = new Date(s + "T12:00:00");
     return (
