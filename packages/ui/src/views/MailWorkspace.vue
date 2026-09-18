@@ -19,6 +19,7 @@ const auth = ref({
   encryptionAvailable: true,
 });
 const dueDate = ref("");
+const replyBody = ref("");
 
 const selected = computed(
   () => snapshot.value.messages.find((m) => m.id === selectedId.value) ?? null,
@@ -60,7 +61,8 @@ async function load() {
 async function connect(provider: "google" | "microsoft") {
   if (!host) return;
   await run(async () => {
-    await host.connectMail(provider);
+    const account = await host.connectMail(provider);
+    await host.syncMail(account.id);
     await load();
   });
 }
@@ -73,6 +75,25 @@ async function disconnect(accountId: string) {
     await load();
   });
 }
+async function syncAccount(accountId: string) {
+  if (!host) return;
+  await run(async () => {
+    const count = await host.syncMail(accountId);
+    await load();
+    tasks.notice = `${count} e-mail(s) synchronisé(s)`;
+  });
+}
+async function sendReply() {
+  if (!host || !selected.value || !replyBody.value.trim()) return;
+  await run(async () => {
+    await host.replyMail(selected.value!.id, replyBody.value);
+    replyBody.value = "";
+    tasks.notice = "Réponse envoyée";
+    await host.syncMail(selected.value!.accountId);
+    await load();
+  });
+}
+
 async function openMessage(id: string) {
   selectedId.value = id;
   const item = snapshot.value.messages.find((m) => m.id === id);
@@ -159,7 +180,10 @@ onMounted(async () => {
             <strong>{{ account.displayName || account.email }}</strong>
             <small>{{ account.email }} · {{ account.provider === "google" ? "Gmail" : "Microsoft 365" }}</small>
           </span>
-          <button :disabled="busy" @click="disconnect(account.id)">Déconnecter</button>
+          <span class="inline">
+            <button :disabled="busy" @click="syncAccount(account.id)">Synchroniser</button>
+            <button :disabled="busy" @click="disconnect(account.id)">Déconnecter</button>
+          </span>
         </div>
         <div class="inline">
           <button
@@ -200,7 +224,7 @@ onMounted(async () => {
           </button>
           <div v-if="!snapshot.messages.length" class="empty-state compact">
             <Mail aria-hidden="true" />
-            <p>Aucun e-mail en cache. La synchronisation fournisseur arrive dans l’étape suivante.</p>
+            <p>Aucun e-mail en cache. Utilisez « Synchroniser » pour récupérer les messages récents.</p>
           </div>
         </aside>
 
@@ -219,6 +243,21 @@ onMounted(async () => {
               </span>
             </header>
             <pre class="mail-body">{{ selected.bodyText || selected.snippet }}</pre>
+            <form v-if="host" class="mail-reply" @submit.prevent="sendReply">
+              <label for="mail-reply-body">Répondre</label>
+              <textarea
+                id="mail-reply-body"
+                v-model="replyBody"
+                rows="5"
+                maxlength="200000"
+                placeholder="Écrivez votre réponse…"
+              />
+              <div class="form-actions">
+                <button class="primary" :disabled="busy || !replyBody.trim()">
+                  Envoyer la réponse
+                </button>
+              </div>
+            </form>
             <div class="mail-actions">
               <button :disabled="busy || !!selected.taskId" @click="toTask">
                 <Link2 aria-hidden="true" />{{ selected.taskId ? "Tâche liée" : "Créer une tâche" }}
