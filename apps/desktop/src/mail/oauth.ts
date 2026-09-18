@@ -22,9 +22,20 @@ type ProviderConfig = {
   scopes: string[];
 };
 
+// Les IDs OAuth d'une application desktop sont des identifiants publics.
+// Les variables d'environnement restent prioritaires pour permettre un autre
+// projet OAuth sans reconstruire le code. Aucun jeton utilisateur ni secret
+// confidentiel n'est embarqué ici.
+const bundledClientIds = {
+  google:
+    "1049737887729-2fg14m7olivk6rvg4b6an0vtj2d330is.apps.googleusercontent.com",
+  microsoft: "60068a29-121e-4ec3-abdb-6d9587bf013b",
+} as const;
+
 const configs = (): Record<MailProvider, ProviderConfig> => ({
   google: {
-    clientId: process.env.TASKFLOW_GOOGLE_CLIENT_ID?.trim() ?? "",
+    clientId:
+      process.env.TASKFLOW_GOOGLE_CLIENT_ID?.trim() || bundledClientIds.google,
     clientSecret: process.env.TASKFLOW_GOOGLE_CLIENT_SECRET?.trim() || undefined,
     authorize: "https://accounts.google.com/o/oauth2/v2/auth",
     token: "https://oauth2.googleapis.com/token",
@@ -36,7 +47,9 @@ const configs = (): Record<MailProvider, ProviderConfig> => ({
     ],
   },
   microsoft: {
-    clientId: process.env.TASKFLOW_MICROSOFT_CLIENT_ID?.trim() ?? "",
+    clientId:
+      process.env.TASKFLOW_MICROSOFT_CLIENT_ID?.trim() ||
+      bundledClientIds.microsoft,
     authorize:
       "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
     token: "https://login.microsoftonline.com/common/oauth2/v2.0/token",
