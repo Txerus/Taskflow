@@ -39,11 +39,17 @@ onUnmounted(() => {
   generation++;
 });
 async function navigate(hit: SearchHit) {
-  const failure = await router.push(
-    hit.kind === "page" ? "/notes/" + hit.id : "/list",
-  );
-  if (failure) return;
-  if (hit.kind === "task") {
+  if (hit.kind === "page") {
+    const target = "/notes/" + hit.id;
+    if (router.currentRoute.value.path !== target) {
+      const failure = await router.push(target);
+      if (failure) return;
+    }
+  } else {
+    if (router.currentRoute.value.path !== "/list") {
+      const failure = await router.push("/list");
+      if (failure) return;
+    }
     await tasks.load();
     tasks.query = "";
     tasks.projectFilter = "";
