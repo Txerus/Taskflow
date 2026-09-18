@@ -8,6 +8,7 @@ import {
   TaskWorkspace,
   DesignSystem,
   NotesWorkspace,
+  MailWorkspace,
 } from "@taskflow/ui";
 import type { DataStore, DesktopHost } from "@taskflow/data";
 import "../../../packages/ui/src/style.css";
@@ -22,6 +23,7 @@ const router = createRouter({
     { path: "/", redirect: "/today" },
     { path: "/design", component: DesignSystem },
     { path: "/notes/:pageId?", component: NotesWorkspace },
+    { path: "/mail", component: MailWorkspace },
     { path: "/:view", component: TaskWorkspace },
   ],
 });
