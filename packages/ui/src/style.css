@@ -1440,6 +1440,24 @@ legend {
   font: inherit;
   line-height: 1.55;
 }
+.mail-reply {
+  padding-block: var(--s4);
+  border-top: 1px solid var(--line);
+}
+.mail-reply > label {
+  display: block;
+  margin-bottom: var(--s2);
+  font-weight: 600;
+}
+.mail-reply textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 112px;
+}
+.mail-reply .form-actions {
+  margin-top: var(--s2);
+}
+
 .mail-actions {
   display: flex;
   align-items: end;
