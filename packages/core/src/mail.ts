@@ -1,5 +1,17 @@
 import { z } from "zod";
-import { daySchema, idSchema } from "./index";
+const mailIdSchema = z.string().uuid();
+const mailDaySchema = z
+  .string()
+  .regex(/^\\d{4}-\\d{2}-\\d{2}$/)
+  .refine((s) => {
+    const d = new Date(s + "T12:00:00");
+    return (
+      !Number.isNaN(+d) &&
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+        d.getDate(),
+      ).padStart(2, "0")}` === s
+    );
+  }, "Date invalide");
 
 export const mailProviderSchema = z.enum(["google", "microsoft"]);
 export type MailProvider = z.infer<typeof mailProviderSchema>;
@@ -69,7 +81,7 @@ export interface MailSnapshot {
 
 export const mailAccountInputSchema = z
   .object({
-    id: idSchema.optional(),
+    id: mailIdSchema.optional(),
     provider: mailProviderSchema,
     email: z.string().trim().email().max(320),
     displayName: z.string().trim().max(300).default(""),
@@ -80,7 +92,7 @@ export const mailAccountInputSchema = z
 
 export const mailMessageInputSchema = z
   .object({
-    accountId: idSchema,
+    accountId: mailIdSchema,
     providerMessageId: z.string().trim().min(1).max(2000),
     threadId: z.string().max(2000).nullable().default(null),
     internetMessageId: z.string().max(2000).nullable().default(null),
@@ -110,16 +122,16 @@ export const mailAttachmentInputSchema = z
 
 export const mailWaitingInputSchema = z
   .object({
-    messageId: idSchema,
+    messageId: mailIdSchema,
     expectedFrom: z.string().trim().email().max(320),
-    dueDate: daySchema.nullable().default(null),
+    dueDate: mailDaySchema.nullable().default(null),
   })
   .strict();
 
 export const mailReplySchema = z
   .object({
-    accountId: idSchema,
-    messageId: idSchema,
+    accountId: mailIdSchema,
+    messageId: mailIdSchema,
     body: z.string().trim().min(1).max(200_000),
   })
   .strict();
