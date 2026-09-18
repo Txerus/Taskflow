@@ -1167,10 +1167,23 @@ legend {
   align-items: center;
   gap: var(--s2);
 }
-.image-picker input {
-  width: auto;
-  max-width: 100%;
+.image-picker button {
   font-size: 12px;
+}
+.image-picker small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.image-picker .file-input-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 .note-editor .tiptap {
   min-height: 260px;
