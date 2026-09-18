@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
 import { Mail, RefreshCw, Link2, Clock3, Paperclip } from "lucide-vue-next";
-import { taskInputSchema, type MailSnapshot } from "@taskflow/core";
+import {
+  taskInputSchema,
+  type MailAttachment,
+  type MailSnapshot,
+} from "@taskflow/core";
 import { hostKey, storeKey } from "../context";
 import { useTasks } from "../store";
 
@@ -20,6 +24,7 @@ const auth = ref({
 });
 const dueDate = ref("");
 const replyBody = ref("");
+const attachments = ref<MailAttachment[]>([]);
 
 const selected = computed(
   () => snapshot.value.messages.find((m) => m.id === selectedId.value) ?? null,
@@ -96,6 +101,7 @@ async function sendReply() {
 
 async function openMessage(id: string) {
   selectedId.value = id;
+  attachments.value = await data.mailAttachments(id);
   const item = snapshot.value.messages.find((m) => m.id === id);
   if (item?.unread)
     await run(async () => {
@@ -242,6 +248,18 @@ onMounted(async () => {
                 <Paperclip aria-hidden="true" />Pièces jointes
               </span>
             </header>
+            <div v-if="attachments.length" class="mail-attachments">
+              <strong>Pièces jointes</strong>
+              <button
+                v-for="a in attachments"
+                :key="a.id"
+                :disabled="busy || !host"
+                @click="host?.openMailAttachment(selected.id, a.id)"
+              >
+                <Paperclip aria-hidden="true" />{{ a.name }}
+                <small>{{ Math.max(1, Math.round(a.size / 1024)) }} Ko</small>
+              </button>
+            </div>
             <pre class="mail-body">{{ selected.bodyText || selected.snippet }}</pre>
             <form v-if="host" class="mail-reply" @submit.prevent="sendReply">
               <label for="mail-reply-body">Répondre</label>
