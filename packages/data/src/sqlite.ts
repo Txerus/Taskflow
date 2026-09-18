@@ -94,6 +94,12 @@ export class SqliteDataStore implements DataStore {
   async resolveMailWaiting(id: string) {
     this.mail.resolveWaiting(id);
   }
+  async saveMailRule(input: Parameters<MailRepository["saveRule"]>[0]) {
+    return this.mail.saveRule(input);
+  }
+  async deleteMailRule(id: string) {
+    this.mail.deleteRule(id);
+  }
   async notesSnapshot() {
     return this.notes.snapshot();
   }
