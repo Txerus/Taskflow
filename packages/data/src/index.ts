@@ -6,6 +6,10 @@ import type {
   NoteKind,
   RichNode,
   SearchHit,
+  MailSnapshot,
+  MailAttachment as CachedMailAttachment,
+  MailMessage,
+  MailWaiting,
 } from "@taskflow/core";
 import type {
   Task,
@@ -23,6 +27,17 @@ export interface Snapshot {
   preferences: Preferences;
 }
 export interface DataStore {
+  mailSnapshot(): Promise<MailSnapshot>;
+  mailAttachments(messageId: string): Promise<CachedMailAttachment[]>;
+  setMailRead(messageId: string, read: boolean): Promise<MailMessage>;
+  linkMailTask(messageId: string, taskId: string | null): Promise<MailMessage>;
+  createTaskFromMail(messageId: string, input: TaskInput): Promise<Task>;
+  waitForMailReply(input: {
+    messageId: string;
+    expectedFrom: string;
+    dueDate: string | null;
+  }): Promise<MailWaiting>;
+  resolveMailWaiting(id: string): Promise<void>;
   notesSnapshot(): Promise<NotesSnapshot>;
   saveNotebook(input: {
     id?: string;
