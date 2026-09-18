@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref } from "vue";
-import { Mail, RefreshCw, Link2, Clock3, Paperclip } from "lucide-vue-next";
+import { Mail, RefreshCw, Link2, Clock3, Paperclip, Building2, Sparkles } from "lucide-vue-next";
 import {
   taskInputSchema,
+  detectMailAction,
   type MailAttachment,
   type MailSnapshot,
 } from "@taskflow/core";
@@ -43,6 +44,20 @@ const waiting = computed(() =>
     ? snapshot.value.waiting.find((w) => w.messageId === selected.value!.id)
     : null,
 );
+const suggestion = computed(() =>
+  selected.value
+    ? detectMailAction({
+        subject: selected.value.subject,
+        bodyText: selected.value.bodyText || selected.value.snippet,
+      })
+    : null,
+);
+const microsoftAdminBlocked = computed(() =>
+  /admin|administrator|administrateur|consent|approval|approbation|aadsts65001/i.test(
+    error.value,
+  ),
+);
+const microsoftClientId = "60068a29-121e-4ec3-abdb-6d9587bf013b";
 
 function message(e: unknown) {
   return e instanceof Error ? e.message : String(e);
@@ -138,14 +153,14 @@ async function openMessage(id: string) {
       await load();
     });
 }
-async function toTask() {
+async function toTask(suggestedTitle?: string) {
   if (!selected.value || selected.value.taskId) return;
   await run(async () => {
     const m = selected.value!;
     const task = await data.createTaskFromMail(
       m.id,
       taskInputSchema.parse({
-        title: `Répondre : ${m.subject || "(sans objet)"}`,
+        title: suggestedTitle || `Répondre : ${m.subject || "(sans objet)"}`,
         description: [
           `E-mail de ${m.from.name || m.from.email} <${m.from.email}>`,
           "",
@@ -206,6 +221,27 @@ onMounted(async () => {
     </header>
 
     <div v-if="error" class="error-banner" role="alert">{{ error }}</div>
+    <section
+      v-if="microsoftAdminBlocked"
+      class="mail-enterprise-help"
+      aria-label="Autorisation Microsoft 365 requise"
+    >
+      <Building2 aria-hidden="true" />
+      <div>
+        <strong>Votre entreprise contrôle l’accès à Microsoft 365</strong>
+        <p>
+          TaskFlow fonctionne avec les comptes Microsoft 365 de plusieurs entreprises.
+          Si votre organisation bloque le consentement utilisateur, un administrateur
+          Entra doit approuver TaskFlow une fois pour l’organisation.
+        </p>
+        <p class="muted">
+          À transmettre à l’IT : application « TaskFlow Desktop » · Client ID
+          <code>{{ microsoftClientId }}</code> · permissions déléguées
+          <code>User.Read</code>, <code>Mail.ReadWrite</code> et <code>Mail.Send</code>.
+          Aucun mot de passe utilisateur n’est demandé à l’administrateur.
+        </p>
+      </div>
+    </section>
     <div v-if="loading" class="loading" role="status">Chargement des e-mails…</div>
 
     <template v-else>
@@ -238,6 +274,10 @@ onMounted(async () => {
         </div>
         <p v-if="host && (!auth.googleConfigured || !auth.microsoftConfigured)" class="muted">
           Les boutons sont activés lorsque les identifiants OAuth correspondants sont configurés.
+        </p>
+        <p v-if="host && auth.microsoftConfigured" class="muted mail-enterprise-note">
+          Compte Microsoft 365 d’entreprise : selon la politique de votre organisation,
+          l’administrateur peut devoir approuver TaskFlow avant la première connexion.
         </p>
       </section>
 
@@ -327,6 +367,24 @@ onMounted(async () => {
               </button>
             </div>
             <pre class="mail-body">{{ selected.bodyText || selected.snippet }}</pre>
+            <section
+              v-if="suggestion?.actionable && !selected.taskId"
+              class="mail-action-suggestion"
+              aria-label="Suggestion de tâche"
+            >
+              <Sparkles aria-hidden="true" />
+              <div>
+                <strong>TaskFlow détecte une demande à traiter</strong>
+                <p>{{ suggestion.suggestedTitle }}</p>
+                <small>
+                  Analyse locale · {{ Math.round(suggestion.confidence * 100) }} % ·
+                  {{ suggestion.reasons.join(" · ") }}. Aucun contenu envoyé à un service IA.
+                </small>
+              </div>
+              <button :disabled="busy" @click="toTask(suggestion.suggestedTitle)">
+                Créer la tâche
+              </button>
+            </section>
             <form v-if="host" class="mail-reply" @submit.prevent="sendReply">
               <label for="mail-reply-body">Répondre</label>
               <textarea
