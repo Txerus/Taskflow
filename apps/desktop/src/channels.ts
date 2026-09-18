@@ -1,4 +1,12 @@
 export const channels = {
+  mailSnapshot: "mail:snapshot",
+  mailAttachments: "mail:attachments",
+  setMailRead: "mail:setRead",
+  linkMailTask: "mail:linkTask",
+  createTaskFromMail: "mail:createTask",
+  waitForMailReply: "mail:waitForReply",
+  resolveMailWaiting: "mail:resolveWaiting",
+
   notesSnapshot: "notes:notesSnapshot",
   saveNotebook: "notes:saveNotebook",
   saveSection: "notes:saveSection",
