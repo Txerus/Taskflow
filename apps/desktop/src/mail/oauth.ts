@@ -45,9 +45,9 @@ const configs = (): Record<MailProvider, ProviderConfig> => ({
       "profile",
       "email",
       "offline_access",
-      "User.Read",
-      "Mail.ReadWrite",
-      "Mail.Send",
+      "https://graph.microsoft.com/User.Read",
+      "https://graph.microsoft.com/Mail.ReadWrite",
+      "https://graph.microsoft.com/Mail.Send",
     ],
   },
 });
