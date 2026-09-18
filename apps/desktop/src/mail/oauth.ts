@@ -160,9 +160,12 @@ export class MailOAuth {
         else resolve(value!);
       };
       const server = createServer((req, res) => {
-        const base = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
+        const port = (server.address() as { port: number }).port;
+        const callbackPath = provider === "microsoft" ? "/" : "/oauth/callback";
+        const host = provider === "microsoft" ? "localhost" : "127.0.0.1";
+        const base = `http://${host}:${port}`;
         const url = new URL(req.url ?? "/", base);
-        if (url.pathname !== "/oauth/callback") {
+        if (url.pathname !== callbackPath) {
           res.writeHead(404).end();
           return;
         }
@@ -184,7 +187,7 @@ export class MailOAuth {
         res.end(
           "<!doctype html><html lang=\"fr\"><meta charset=\"utf-8\"><title>TaskFlow</title><body><h1>Connexion réussie</h1><p>Vous pouvez fermer cet onglet et revenir dans TaskFlow.</p></body></html>",
         );
-        finish(undefined, { code, redirectUri: base + "/oauth/callback" });
+        finish(undefined, { code, redirectUri: base + callbackPath });
       });
       server.on("error", (e) => finish(e instanceof Error ? e : new Error(String(e))));
       const timer = setTimeout(
@@ -193,7 +196,9 @@ export class MailOAuth {
       );
       server.listen(0, "127.0.0.1", async () => {
         const address = server.address() as { port: number };
-        const redirectUri = `http://127.0.0.1:${address.port}/oauth/callback`;
+        const callbackPath = provider === "microsoft" ? "/" : "/oauth/callback";
+        const host = provider === "microsoft" ? "localhost" : "127.0.0.1";
+        const redirectUri = `http://${host}:${address.port}${callbackPath}`;
         const auth = new URL(config.authorize);
         auth.searchParams.set("client_id", config.clientId);
         auth.searchParams.set("response_type", "code");
