@@ -73,10 +73,24 @@ export interface MailWaiting {
   resolvedAt: string | null;
 }
 
+export interface MailRule {
+  id: string;
+  name: string;
+  enabled: boolean;
+  senderContains: string;
+  subjectContains: string;
+  unreadOnly: boolean;
+  createTask: boolean;
+  priority: 1 | 2 | 3 | 4;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface MailSnapshot {
   accounts: MailAccount[];
   messages: MailMessage[];
   waiting: MailWaiting[];
+  rules: MailRule[];
 }
 
 export const mailAccountInputSchema = z
@@ -127,6 +141,23 @@ export const mailWaitingInputSchema = z
     dueDate: mailDaySchema.nullable().default(null),
   })
   .strict();
+
+export const mailRuleInputSchema = z
+  .object({
+    id: mailIdSchema.optional(),
+    name: z.string().trim().min(1).max(100),
+    enabled: z.boolean().default(true),
+    senderContains: z.string().trim().max(320).default(""),
+    subjectContains: z.string().trim().max(500).default(""),
+    unreadOnly: z.boolean().default(false),
+    createTask: z.boolean().default(true),
+    priority: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]).default(3),
+  })
+  .strict()
+  .refine((v) => !!v.senderContains || !!v.subjectContains, {
+    message: "Ajoutez au moins un critère expéditeur ou objet.",
+  });
+export type MailRuleInput = z.infer<typeof mailRuleInputSchema>;
 
 export const mailReplySchema = z
   .object({
