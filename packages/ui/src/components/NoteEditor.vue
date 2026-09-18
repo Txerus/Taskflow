@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, onBeforeUnmount } from "vue";
+import { ref, watch, onBeforeUnmount } from "vue";
 import { useEditor, EditorContent, Node, mergeAttributes } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
@@ -8,6 +8,7 @@ import { TableKit } from "@tiptap/extension-table";
 import Image from "@tiptap/extension-image";
 import type { RichNode } from "@taskflow/core";
 const props = defineProps<{ content: RichNode; disabled: boolean }>();
+const imageInput = ref<HTMLInputElement | null>(null);
 const emit = defineEmits<{
   change: [content: RichNode];
   reference: [kind: "page" | "task", query: string];
@@ -264,13 +265,26 @@ defineExpose({ replace, insertReference, cancelReference, addTaskItem });
         @Tâche
       </button>
     </div>
-    <label class="image-picker"
-      >Insérer une image<input
+    <div class="image-picker">
+      <span>Insérer une image</span>
+      <button
+        type="button"
+        :disabled="disabled"
+        @click="imageInput?.click()"
+      >
+        Choisir une image
+      </button>
+      <small>PNG, JPEG ou WebP · 2,5 Mo max</small>
+      <input
+        ref="imageInput"
+        class="file-input-hidden"
         type="file"
         accept="image/png,image/jpeg,image/webp"
         :disabled="disabled"
+        aria-label="Fichier image"
         @change="image"
-    /></label>
+      />
+    </div>
     <EditorContent :editor="editor" />
   </div>
 </template>
