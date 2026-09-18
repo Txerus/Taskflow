@@ -2,6 +2,8 @@ export const channels = {
   mailAuthStatus: "mail:authStatus",
   connectMail: "mail:connect",
   disconnectMail: "mail:disconnect",
+  syncMail: "mail:sync",
+  replyMail: "mail:reply",
   mailSnapshot: "mail:snapshot",
   mailAttachments: "mail:attachments",
   setMailRead: "mail:setRead",
