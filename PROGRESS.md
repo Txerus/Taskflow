@@ -52,3 +52,15 @@ Revue visuelle effectuée sur les captures Carnets clair/sombre en 1280×800 et 
 L’utilisateur confirme « parfait continue » après la livraison et la validation Windows de TaskFlow 0.2.0. Phase 2 validée ; Phase 3 mails autorisée.
 
 Architecture retenue pour la Phase 3 : intégrations Gmail et Microsoft 365 en OAuth 2.0 Authorization Code + PKCE via navigateur système et callback loopback local ; jetons OAuth chiffrés avec Electron safeStorage et jamais exposés au renderer ; cache mail SQLite local ; fournisseurs derrière une interface commune ; lecture/réponse/pièces jointes, mail → tâche, règles et suivi d’attente testables hors ligne avant connexion réelle. Les identifiants OAuth restent un jalon externe : le développement peut avancer avec configuration vide et doubles de test, mais une connexion réelle Google/Microsoft ne sera pas déclarée validée avant fourniture/configuration des client IDs et consentements correspondants.
+
+
+## Phase 3 — socle mails implémenté et validé Windows — 18 septembre 2026
+Première tranche Phase 3 implémentée : migration SQLite 3 additive pour comptes, cache de messages, métadonnées de pièces jointes, suivis d’attente et règles futures ; modèle métier validé ; opérations DataStore/IPC ; espace « Messagerie » dans la navigation.
+
+OAuth : flux Authorization Code + PKCE dans le navigateur système avec callback loopback, contrôle state, renouvellement des access tokens et stockage des jetons chiffré par Electron safeStorage. Google utilise le client Desktop et Gmail modify ; Microsoft utilise une application publique Mobile/Desktop avec redirect http://localhost et permissions Graph déléguées User.Read, Mail.ReadWrite et Mail.Send. Aucun jeton OAuth n’est exposé au renderer.
+
+Fournisseurs : synchronisation des 100 messages récents, lecture texte hors ligne, état non lu, métadonnées de pièces jointes, réponse Gmail/Microsoft, téléchargement à la demande des pièces jointes autorisées avec confirmation native et limite 25 Mo. Mail → tâche et suivi « attendre une réponse » sont reliés au stockage local.
+
+Validation CI : run https://github.com/Txerus/Taskflow/actions/runs/35331853641 sur le commit 40fb71183df1765277194ce82726af051d4724aa. TypeScript, 56 tests Vitest, 9 parcours Electron, build NSIS et smoke test installation/lancement Windows réussis. Artefact TaskFlow-Windows produit. Cette validation couvre le code et les régressions hors connexion ; elle ne constitue pas une validation réelle des API Gmail/Graph.
+
+Jalon externe restant : fournir/configurer les client IDs OAuth Google et Microsoft, puis effectuer une connexion réelle sur chaque fournisseur pour valider consentement, synchronisation, réponse et pièces jointes. Les règles mail, suggestions IA et relances automatiques restent à développer après ce jalon ou en parallèle sans prétendre valider les fournisseurs.
