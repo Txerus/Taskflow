@@ -12,7 +12,7 @@ import { useTasks } from "../store";
 const data = inject(storeKey)!;
 const host = inject(hostKey, undefined);
 const tasks = useTasks();
-const snapshot = ref<MailSnapshot>({ accounts: [], messages: [], waiting: [] });
+const snapshot = ref<MailSnapshot>({ accounts: [], messages: [], waiting: [], rules: [] });
 const selectedId = ref("");
 const loading = ref(true);
 const busy = ref(false);
