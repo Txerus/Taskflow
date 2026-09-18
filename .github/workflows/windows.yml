@@ -55,7 +55,7 @@ jobs:
           # Dernière validation Windows
 
           - État : $env:TASKFLOW_CI_STATUS
-          - Commit testé : `$env:TASKFLOW_CI_SHA`
+          - Commit testé : $env:TASKFLOW_CI_SHA
           - Run : $env:TASKFLOW_CI_RUN
           - Date UTC : $stamp
 
