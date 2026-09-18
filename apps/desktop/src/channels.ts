@@ -4,6 +4,7 @@ export const channels = {
   disconnectMail: "mail:disconnect",
   syncMail: "mail:sync",
   replyMail: "mail:reply",
+  openMailAttachment: "mail:openAttachment",
   mailSnapshot: "mail:snapshot",
   mailAttachments: "mail:attachments",
   setMailRead: "mail:setRead",
