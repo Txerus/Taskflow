@@ -304,6 +304,33 @@ export class MailService {
     return result.value.length;
   }
 
+  async attachment(messageId: string, attachmentId: string) {
+    const message = this.store.mail.getMessage(messageId);
+    const meta = this.store.mail
+      .attachments(messageId)
+      .find((a) => a.id === attachmentId);
+    if (!meta) throw new Error("Pièce jointe introuvable.");
+    const account = this.account(message.accountId);
+    const token = await this.oauth.accessToken(account.id);
+    if (account.provider === "google") {
+      const result = await request<{ data?: string }>(
+        "Gmail",
+        `https://gmail.googleapis.com/gmail/v1/users/me/messages/${encodeURIComponent(message.providerMessageId)}/attachments/${encodeURIComponent(meta.providerAttachmentId)}`,
+        token,
+      );
+      if (!result.data) throw new Error("Pièce jointe Gmail vide.");
+      return { meta, bytes: Buffer.from(result.data.replace(/-/g, "+").replace(/_/g, "/"), "base64") };
+    }
+    const result = await request<{ contentBytes?: string }>(
+      "Microsoft Graph",
+      `https://graph.microsoft.com/v1.0/me/messages/${encodeURIComponent(message.providerMessageId)}/attachments/${encodeURIComponent(meta.providerAttachmentId)}`,
+      token,
+    );
+    if (!result.contentBytes)
+      throw new Error("Ce type de pièce jointe Microsoft n’est pas encore pris en charge.");
+    return { meta, bytes: Buffer.from(result.contentBytes, "base64") };
+  }
+
   async reply(messageId: string, body: string) {
     const message = this.store.mail.getMessage(messageId);
     const account = this.account(message.accountId);
