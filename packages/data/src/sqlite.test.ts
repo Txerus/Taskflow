@@ -24,7 +24,7 @@ describe("SQLite", () => {
     expect((await store.snapshot()).tasks[0].title).toBe("Offre FE141");
     expect(
       store.db.prepare("SELECT * FROM schema_migrations").all(),
-    ).toHaveLength(2);
+    ).toHaveLength(3);
   });
   it("valide DTO et relations", async () => {
     await expect(
@@ -118,6 +118,57 @@ describe("SQLite", () => {
     await store.deleteTask(b.id);
     expect(store.dueReminders(new Date("2026-02-01"))).toHaveLength(0);
   });
+  it("met en cache les mails et crée une tâche liée sans doublon", async () => {
+    const account = store.mail.saveAccount({
+      provider: "google",
+      email: "test@example.com",
+      displayName: "Compte test",
+    });
+    const raw = {
+      accountId: account.id,
+      providerMessageId: "msg-1",
+      threadId: "thread-1",
+      internetMessageId: "<msg-1@example.com>",
+      subject: "Offre à relancer",
+      from: { name: "Client", email: "client@example.com" },
+      to: [{ name: "Moi", email: "test@example.com" }],
+      cc: [],
+      receivedAt: "2026-09-18T08:00:00.000Z",
+      sentAt: null,
+      snippet: "Pouvez-vous revenir vers nous ?",
+      bodyText: "Bonjour, pouvez-vous revenir vers nous ?",
+      unread: true,
+      hasAttachments: true,
+      folder: "inbox" as const,
+    };
+    const first = store.mail.upsertMessage(raw);
+    const second = store.mail.upsertMessage({ ...raw, unread: false });
+    expect(second.id).toBe(first.id);
+    expect(second.unread).toBe(false);
+    store.mail.replaceAttachments(first.id, [
+      {
+        providerAttachmentId: "att-1",
+        name: "offre.pdf",
+        mimeType: "application/pdf",
+        size: 1234,
+      },
+    ]);
+    expect(await store.mailAttachments(first.id)).toHaveLength(1);
+    const task = await store.createTaskFromMail(
+      first.id,
+      input("Répondre à Offre à relancer"),
+    );
+    expect((await store.mailSnapshot()).messages[0].taskId).toBe(task.id);
+    const waiting = await store.waitForMailReply({
+      messageId: first.id,
+      expectedFrom: "client@example.com",
+      dueDate: "2026-09-25",
+    });
+    expect(waiting.resolvedAt).toBeNull();
+    await store.resolveMailWaiting(waiting.id);
+    expect((await store.mailSnapshot()).waiting[0].resolvedAt).not.toBeNull();
+  });
+
   it("refuse une version future de DB", () => {
     store.db
       .prepare("INSERT INTO schema_migrations VALUES(99,?)")
